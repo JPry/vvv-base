@@ -8,6 +8,9 @@ noroot composer install
 
 # Maybe install WordPress
 if ! $(wp core is-installed); then
+	echo "Installing WordPress..."
+	echo ""
+
 	WP_ADMIN_USER=`get_config_value admin_user 'admin_default'`
 	WP_ADMIN_PASS=`get_config_value admin_password 'password_default'`
 	WP_ADMIN_EMAIL=`get_config_value admin_email 'admin@localhost.dev'`
