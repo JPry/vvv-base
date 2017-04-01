@@ -4,7 +4,7 @@
 cd "${VM_DIR}"
 
 # Run composer
-noroot composer update
+noroot composer install
 
 # Maybe install WordPress
 if ! $(wp core is-installed); then
