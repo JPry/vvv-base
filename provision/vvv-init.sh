@@ -29,12 +29,12 @@ echo -e "\nLog files done."
 if ! noroot wp core is-installed; then
 	echo -e "Installing WordPress...\n\n"
 
-	WP_ADMIN_USER=`get_config_value admin_user 'admin_default'`
-	WP_ADMIN_PASS=`get_config_value admin_password 'password_default'`
+	WP_ADMIN_USER=`get_config_value admin_user 'admin'`
+	WP_ADMIN_PASS=`get_config_value admin_password 'password'`
 	WP_ADMIN_EMAIL=`get_config_value admin_email 'admin@localhost.dev'`
 	WP_SITE_TITLE=`get_config_value title 'My Awesome Site'`
 
-	noroot wp core config --dbname="${SITE_ESCAPED}" --dbuser=wp --dbpass=wp --dbhost="localhost" --dbprefix=wp_ --locale=en_US --extra-php <<PHP
+	noroot wp core config --force --dbname="${SITE_ESCAPED}" --dbuser=wp --dbpass=wp --dbhost="localhost" --dbprefix=wp_ --locale=en_US --extra-php <<PHP
 define( 'WP_DEBUG', true );
 define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_DEBUG_LOG', true );
