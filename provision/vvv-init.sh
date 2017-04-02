@@ -18,6 +18,13 @@ mysql -u root --password=root -e "CREATE DATABASE IF NOT EXISTS \`${SITE_ESCAPED
 mysql -u root --password=root -e "GRANT ALL PRIVILEGES ON \`${SITE_ESCAPED}\`.* TO wp@localhost IDENTIFIED BY 'wp';"
 echo -e "\n DB operations done.\n\n"
 
+# Nginx Logs
+echo -e "\nCreating log files"
+mkdir -p ${VVV_PATH_TO_SITE}/log
+touch ${VVV_PATH_TO_SITE}/log/error.log
+touch ${VVV_PATH_TO_SITE}/log/access.log
+echo -e "\nLog files done."
+
 # Maybe install WordPress
 if [[ ! $(noroot wp core is-installed) ]]; then
 	echo -e "Installing WordPress...\n\n"
