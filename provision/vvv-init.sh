@@ -5,9 +5,10 @@ cd "${VM_DIR}"
 
 # Some variables we'll need
 WP_HOST=`get_primary_host`
+NGINX_CONFIG_TEMPLATE="${VM_DIR}/provision/vvv-nginx.template"
 NGINX_CONFIG_FILE="${VM_DIR}/provision/vvv-nginx.conf"
 XIPIO_BASE=`echo ${WP_HOST} | sed -E 's#(.*)\.[a-zA-Z0-9_]+$#\1#'`
-NGINX_XIPIO="~^${XIPIO_BASE/./\\.}\.\d+\.\d+\.\d+\.\d+\.xip\.io$"
+NGINX_XIPIO="~^${XIPIO_BASE/./\\\\.}\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$" # Lots of extra slashes to survive until the final file
 
 # Run composer
 noroot composer install
@@ -46,8 +47,7 @@ PHP
 fi
 
 # Add domains to the Nginx config
-sed -i "s#{{wp_server_names}}#`get_hosts` ${NGINX_XIPIO}#" "${NGINX_CONFIG_FILE}"
-
+sed "s#{wp_server_names}#`get_hosts` ${NGINX_XIPIO}#" "${NGINX_CONFIG_TEMPLATE}" > "${NGINX_CONFIG_FILE}"
 
 # Return to the previous directory
 cd -
