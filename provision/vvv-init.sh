@@ -5,6 +5,7 @@ cd "${VM_DIR}"
 
 # Some variables we'll need
 WP_HOST=`get_primary_host`
+WP_CONTENT=`get_config_value wp-content False`
 NGINX_CONFIG_TEMPLATE="${VM_DIR}/provision/vvv-nginx.template"
 NGINX_CONFIG_FILE="${VM_DIR}/provision/vvv-nginx.conf"
 XIPIO_BASE=`echo ${WP_HOST} | sed -E 's#(.*)\.[a-zA-Z0-9_]+$#\1#'`
@@ -25,6 +26,14 @@ mkdir -p ${VVV_PATH_TO_SITE}/log
 touch ${VVV_PATH_TO_SITE}/log/error.log
 touch ${VVV_PATH_TO_SITE}/log/access.log
 echo -e "\nLog files done."
+
+# Maybe remove wp-content
+if [[ False != ${WP_CONTENT} ]]; then
+	noroot composer remove "wordpress/wordpress"
+	noroot composer require "wordpress/wordpress-no-content"
+	noroot composer update
+fi
+
 
 # Maybe install WordPress
 if ! noroot wp core is-installed; then
