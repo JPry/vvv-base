@@ -1,3 +1,8 @@
 vendor/
 htdocs/
+log/
 provision/vvv-nginx.conf
+
+# Composer files are in VCS, but changes to them should be ignored
+composer.json
+composer.lock
