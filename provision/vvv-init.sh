@@ -26,7 +26,7 @@ touch ${VVV_PATH_TO_SITE}/log/access.log
 echo -e "\nLog files done."
 
 # Maybe install WordPress
-if [[ ! $(noroot wp core is-installed) ]]; then
+if ! noroot wp core is-installed; then
 	echo -e "Installing WordPress...\n\n"
 
 	WP_ADMIN_USER=`get_config_value admin_user 'admin_default'`
