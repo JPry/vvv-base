@@ -3,6 +3,12 @@
 # Change to the parent directory to run scripts.
 cd "${VM_DIR}"
 
+# Some variables we'll need
+WP_HOST=`get_primary_host`
+NGINX_CONFIG_FILE="${VM_DIR}/provision/vvv-nginx.conf"
+XIPIO_BASE=`echo ${WP_HOST} | sed -E 's#(.*)\.[a-zA-Z0-9_]+$#\1#'`
+NGINX_XIPIO="~^${XIPIO_BASE/./\\.}\.\d+\.\d+\.\d+\.\d+\.xip\.io$"
+
 # Run composer
 noroot composer install
 
@@ -13,15 +19,13 @@ mysql -u root --password=root -e "GRANT ALL PRIVILEGES ON \`${SITE_ESCAPED}\`.* 
 echo -e "\n DB operations done.\n\n"
 
 # Maybe install WordPress
-if ! $(noroot wp core is-installed); then
-	echo "Installing WordPress..."
-	echo ""
+if [[ ! $(noroot wp core is-installed) ]]; then
+	echo -e "Installing WordPress...\n\n"
 
 	WP_ADMIN_USER=`get_config_value admin_user 'admin_default'`
 	WP_ADMIN_PASS=`get_config_value admin_password 'password_default'`
 	WP_ADMIN_EMAIL=`get_config_value admin_email 'admin@localhost.dev'`
 	WP_SITE_TITLE=`get_config_value title 'My Awesome Site'`
-	WP_HOST=`get_primary_host`
 
 	noroot wp core config --dbname="${SITE_ESCAPED}" --dbuser=wp --dbpass=wp --dbhost="localhost" --dbprefix=wp_ --locale=en_US --extra-php <<PHP
 define( 'WP_DEBUG', true );
@@ -33,6 +37,10 @@ PHP
 
 	noroot wp core install --url="${WP_HOST}" --title="${WP_SITE_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASS}" --admin_email="${WP_ADMIN_EMAIL}"
 fi
+
+# Add domains to the Nginx config
+sed -i "s#{{wp_server_names}}#`get_hosts` ${NGINX_XIPIO}#" "${NGINX_CONFIG_FILE}"
+
 
 # Return to the previous directory
 cd -
