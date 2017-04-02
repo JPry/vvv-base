@@ -1,2 +1,3 @@
 vendor/
 htdocs/
+provision/vvv-nginx.conf
