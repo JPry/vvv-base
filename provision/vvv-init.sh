@@ -56,6 +56,7 @@ define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_DEBUG_LOG', true );
 define( 'SCRIPT_DEBUG', true );
 define( 'JETPACK_DEV_DEBUG', true );
+define( 'JETPACK_STAGING_MODE', true );
 PHP
 
 	noroot wp core install --url="${WP_HOST}" --title="${WP_SITE_TITLE}" --admin_user="${WP_ADMIN_USER}" --admin_password="${WP_ADMIN_PASS}" --admin_email="${WP_ADMIN_EMAIL}"
