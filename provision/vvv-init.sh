@@ -15,10 +15,10 @@ NGINX_XIPIO="~^${XIPIO_BASE/./\\\\.}\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+
 noroot composer install
 
 # Make a database, if we don't already have one
-echo -e "\nCreating database '${SITE_ESCAPED}' (if it's not already there)"
+echo -e "\n\nCreating database '${SITE_ESCAPED}' (if it's not already there)"
 mysql -u root --password=root -e "CREATE DATABASE IF NOT EXISTS \`${SITE_ESCAPED}\`"
 mysql -u root --password=root -e "GRANT ALL PRIVILEGES ON \`${SITE_ESCAPED}\`.* TO wp@localhost IDENTIFIED BY 'wp';"
-echo -e "\n DB operations done.\n\n"
+echo -e "\nDB operations done.\n"
 
 # Nginx Logs
 echo -e "\nCreating log files"
