@@ -49,8 +49,9 @@ if [[ ! $? ]]; then
 	WP_ADMIN_PASS=`get_config_value admin_password 'password'`
 	WP_ADMIN_EMAIL=`get_config_value admin_email 'admin@localhost.dev'`
 	WP_SITE_TITLE=`get_config_value title 'My Awesome Site'`
+	WP_DB_PREFIX=`get_config_value prefix 'wp_'`
 
-	noroot wp core config --force --dbname="${SITE_ESCAPED}" --dbuser=wp --dbpass=wp --dbhost="localhost" --dbprefix=wp_ --locale=en_US --extra-php <<PHP
+	noroot wp core config --force --dbname="${SITE_ESCAPED}" --dbuser=wp --dbpass=wp --dbhost="localhost" --dbprefix="${WP_DB_PREFIX}" --locale=en_US --extra-php <<PHP
 define( 'WP_DEBUG', true );
 define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_DEBUG_LOG', true );
