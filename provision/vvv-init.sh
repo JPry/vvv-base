@@ -41,7 +41,8 @@ fi
 
 
 # Maybe install WordPress
-if ! noroot wp core is-installed; then
+noroot wp core is-installed
+if [[ ! $? ]]; then
 	echo -e "Installing WordPress...\n\n"
 
 	WP_ADMIN_USER=`get_config_value admin_user 'admin'`
