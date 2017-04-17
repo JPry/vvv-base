@@ -27,11 +27,16 @@ touch ${VVV_PATH_TO_SITE}/log/error.log
 touch ${VVV_PATH_TO_SITE}/log/access.log
 echo -e "\nLog files done."
 
-# Maybe remove wp-content
+# Maybe remove default wp-content
 if [[ False != ${WP_CONTENT} ]]; then
+	echo -e "\nSetting up wp-content..."
 	noroot composer remove "wordpress/wordpress"
 	noroot composer require "wordpress/wordpress-no-content"
 	noroot composer update
+
+	echo -e"\nCloning the wp-content repo..."
+	noroot git clone --recursive "${WP_CONTENT}"
+	echo -e"\nwp-content done."
 fi
 
 
