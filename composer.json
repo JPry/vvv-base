@@ -43,7 +43,8 @@
         }
     ],
     "require": {
-        "wordpress/wordpress": "^4.7"
+        "wordpress/wordpress": "^4.7",
+        "symfony/yaml": "^3.2"
     },
     "extra": {
         "wordpress-install-dir": {
