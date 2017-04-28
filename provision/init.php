@@ -103,6 +103,7 @@ exec(get_cmd(array('composer', 'install')));
 $current_site = $config['sites'][$options['site_escaped']];
 $custom = el('custom', $current_site, array());
 $hosts = el('hosts', $current_site, array($options['site_escaped'] . '.local'));
+$main_host = $hosts[0];
 
 // Set up variables we'll need for the current site.
 $site = array(
@@ -179,7 +180,7 @@ PHP;
     // Install WordPress.
     $install_command = $site['multisite'] ? 'multisite-install' : 'install';
     $install_flags = array(
-        'url' => $hosts[0],
+        'url' => $main_host,
         'title' => $site['title'],
         'admin_user' => $site['user'],
         'admin_password' => $site['pass'],
