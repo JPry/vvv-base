@@ -113,6 +113,7 @@ $site = array(
     'title' => el('title', $custom, 'My Awesome VVV site'),
     'db_prefix' => el('prefix', $custom, 'wp_'),
     'multisite' => el('multisite', $custom, false),
+    'xipio' => el('xipio', $custom, true),
 );
 
 // Set up the DB.
