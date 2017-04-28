@@ -201,15 +201,24 @@ PHP;
     );
 }
 
-// Set up server names in template file.
+// Set up the Nginx config file.
 echo "Setting up Nginx config\n";
 $nginx_config = __DIR__ . '/vvv-nginx.conf';
-$using_template = !file_exists($nginx_config);
-$contents = $using_template ? file_get_contents(__DIR__ . '/vvv-nginx.template') : file_get_contents($nginx_config);
-$pattern = $using_template ? '#(\s+){wp_server_names}\s*;#' : '#(server_name\s*)(?:[^;]*);#';
-$xipio_base = preg_replace('#(.*)\.[a-zA-Z0-9_]+$#', '$1', $hosts[0]);
-$nginx_xipio = str_replace('.', '\\.', $xipio_base) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
-$nginx_hosts = join( ' ', $hosts) . " {$nginx_xipio}";
-$contents = preg_replace($pattern, "\$1{$nginx_hosts};", $contents);
+$contents = !file_exists($nginx_config) ? file_get_contents(__DIR__ . '/vvv-nginx.template') : file_get_contents($nginx_config);
+
+// Build the hosts directive, maybe including xipio.
+$nginx_hosts = join(' ', $hosts);
+if ($site['xipio']) {
+    $xipio_base = preg_replace('#(.*)\.[a-zA-Z0-9_]+$#', '$1', $main_host);
+    $nginx_xipio = str_replace(
+            '.',
+            '\\.',
+            $xipio_base
+        ) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
+    $nginx_hosts .= " {$nginx_xipio}";
+}
+
+$contents = preg_replace('#(server_name\s*)(?:[^;]*);#', "\$1{$nginx_hosts};", $contents);
+$contents = str_replace('{wp_main_host}', $main_host, $contents);
 file_put_contents($nginx_config, $contents);
 
