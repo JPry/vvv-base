@@ -35,16 +35,15 @@ function el($key, $array, $default = null)
  *
  * @param array $positional Array of positional arguments.
  * @param array $flags      Array of flags and values.
- * @param bool  $root       Whether to use root. Default false.
  *
  * @return Process
  */
-function get_cmd($positional = array(), $flags = array(), $root = true)
+function get_cmd($positional = array(), $flags = array())
 {
-
-    $process_builder = new ProcessBuilder();
-    if (!$root) {
-        $process_builder->setPrefix('sudo -EH -u "vagrant" -- ');
+    /** @var ProcessBuilder $process_builder */
+    static $process_builder = null;
+    if (null === $process_builder) {
+        $process_builder = new ProcessBuilder();
     }
 
     $process_builder->setArguments($positional);
