@@ -58,7 +58,7 @@ if (!file_exists("{$options['vm_dir']}/htdocs/wp-config.php")) {
 
 
 // Maybe install WordPress
-$is_installed = get_cmd(array('wp', 'core', 'is-installed'))->mustRun()->getExitCode();
+$is_installed = get_cmd(array('wp', 'core', 'is-installed'))->run();
 if (0 !== $is_installed) {
     // Install WordPress.
     $install_command = $site['multisite'] ? 'multisite-install' : 'install';
