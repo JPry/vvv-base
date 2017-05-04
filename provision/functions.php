@@ -231,6 +231,8 @@ function get_site_config($config, $site)
         'xipio'     => el('xipio', $custom, true),
         'main_host' => $hosts[0],
         'hosts'     => $hosts,
+        'version'   => el('version', $custom, 'latest'),
+        'locale'    => el('locale', $custom, 'en_US'),
     );
 
     return $site;

@@ -27,6 +27,8 @@ sites:
             db_prefix: ex_
             multisite: false
             xipio: true
+            version: latest
+            locale: en_US
 ```
 
 ## Options
@@ -66,3 +68,11 @@ Whether to create a multisite installation. There are three valid values:
 ### `xipio`
 
 Whether to enable support for [xip.io](http://xip.io). This will set up the Nginx config to include the Xip.io version of the first domain.
+
+### `version`
+
+The WordPress version to install. The default is `latest`.
+
+### `locale`
+
+The locale to use when installing WordPress. The default is `en_US`.

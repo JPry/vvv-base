@@ -48,7 +48,7 @@ if (!file_exists("{$options['vm_dir']}/htdocs")) {
     mkdir("{$options['vm_dir']}/htdocs", 0775);
 }
 if (!file_exists("{$options['vm_dir']}/htdocs/wp-admin")) {
-    downloadWordPress();
+    downloadWordPress($site['version'], $site['locale']);
 }
 
 // Create wp-config file if needed.
