@@ -3,7 +3,10 @@
 # Change to the parent directory to run scripts.
 cd "${VM_DIR}"
 
-php provision/init.php \
+# Ensure composer is installed
+noroot composer install
+
+noroot php provision/init.php \
 --vvv_path_to_site="${VVV_PATH_TO_SITE}" \
 --vvv_config="${VVV_CONFIG}" \
 --site="${SITE}" \
