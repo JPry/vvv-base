@@ -169,7 +169,7 @@ define( 'JETPACK_DEV_DEBUG', true );
 define( 'JETPACK_STAGING_MODE', true );
 PHP;
 
-        echo get_cmd(
+        echo $this->getCmd(
             array('wp', 'config', 'create'),
             array(
                 'force'     => null,
@@ -193,7 +193,7 @@ PHP;
             return;
         }
 
-        echo get_cmd(
+        echo $this->getCmd(
             array('wp', 'core', 'download'),
             array(
                 'locale'  => $this->site['locale'],
@@ -227,7 +227,7 @@ PHP;
      */
     protected function installWordPress()
     {
-        $is_installed = get_cmd(array('wp', 'core', 'is-installed'))->run();
+        $is_installed = $this->getCmd(array('wp', 'core', 'is-installed'))->run();
         if (0 !== $is_installed) {
             // Install WordPress.
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
@@ -244,7 +244,7 @@ PHP;
                 $install_flags['subdomains'] = null;
             }
 
-            echo get_cmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput();
+            echo $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput();
         }
     }
 }
