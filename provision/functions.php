@@ -6,26 +6,6 @@
 namespace JPry\VVVBase;
 
 /**
- * Get an element from an array.
- *
- * @author Jeremy Pry
- *
- * @param string $key     The array key to search for.
- * @param array  $array   The array to search.
- * @param mixed  $default The default value if the element is not in the array.
- *
- * @return mixed The value from the array, or $default if it's not found.
- */
-function el($key, $array, $default = null)
-{
-    if (array_key_exists($key, $array)) {
-        return $array[$key];
-    }
-
-    return $default;
-}
-
-/**
  * Get the options passed via CLI.
  *
  * @return array
