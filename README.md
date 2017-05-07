@@ -32,6 +32,8 @@ sites:
                 - jetpack
                 - { plugin: "redirect-emails-on-staging", activate: true }
                 - { plugin: "https://github.com/afragen/github-updater/archive/6.3.1.zip", force: true, activate: true }
+            delete_default_plugins: true
+            delete_default_themes: true
 
 ```
 
@@ -92,3 +94,11 @@ A list of plugins to install using WP CLI. There are two ways to specify what pl
  * `force` - Overwrite an existing installed version of the plugin.
  * `activate` - Activate the plugin after installation.
  * `activate-network` - *(Multisite only)* Network activate the plugin after installation.
+ 
+### `delete_default_plugins`
+
+Delete the default plugins. Currently these are Akismet and Hello Dolly.
+
+### `delete_default_themes`
+
+Delete the default themes.

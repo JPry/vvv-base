@@ -57,6 +57,7 @@ class Provisioner
         $this->createWpConfig();
         $this->installWordPress();
         $this->installPlugins();
+        $this->deleteDefaultContent();
         $this->createNginxConfig();
     }
 
@@ -70,18 +71,20 @@ class Provisioner
         $this->site = new ArrayHelper($this->config['custom']);
         $this->site->setDefaults(
             array(
-                'admin_user'     => 'admin',
-                'admin_password' => 'password',
-                'admin_email'    => 'admin@localhost.local',
-                'title'          => 'My Awesome VVV Site',
-                'prefix'         => 'wp_',
-                'multisite'      => false,
-                'xipio'          => true,
-                'version'        => 'latest',
-                'locale'         => 'en_US',
-                'main_host'      => $main_host,
-                'hosts'          => $hosts,
-                'plugins'        => array(),
+                'admin_user'             => 'admin',
+                'admin_password'         => 'password',
+                'admin_email'            => 'admin@localhost.local',
+                'title'                  => 'My Awesome VVV Site',
+                'prefix'                 => 'wp_',
+                'multisite'              => false,
+                'xipio'                  => true,
+                'version'                => 'latest',
+                'locale'                 => 'en_US',
+                'main_host'              => $main_host,
+                'hosts'                  => $hosts,
+                'plugins'                => array(),
+                'delete_default_plugins' => false,
+                'delete_default_themes'  => false,
             )
         );
     }
@@ -186,6 +189,42 @@ PHP;
                 'extra-php' => $extra_php,
             )
         )->mustRun()->getOutput();
+    }
+
+    /**
+     * Delete default plugins and themes.
+     */
+    protected function deleteDefaultContent()
+    {
+        if ($this->site['delete_default_plugins']) {
+            echo "Removing default plugins...\n";
+            $default_plugins = array(
+                'akismet',
+                'hello',
+            );
+            foreach ($default_plugins as $plugin) {
+                $cmd = $this->getCmd(array('plugin', 'delete', $plugin));
+                $cmd->run();
+                echo $cmd->getOutput();
+            }
+        }
+
+        if ($this->site['delete_default_themes']) {
+            echo "Removing default themes...\n";
+            $default_themes = array(
+                'twelve',
+                'thirteen',
+                'fourteen',
+                'fifteen',
+                'sixteen',
+                'seventeen',
+            );
+            foreach ($default_themes as $theme) {
+                $cmd = $this->getCmd(array('theme', 'delete', "twenty{$theme}"));
+                $cmd->run();
+                echo $cmd->getOutput();
+            }
+        }
     }
 
     /**
