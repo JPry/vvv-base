@@ -35,6 +35,8 @@ class Provisioner
         $this->site_name = $site_name;
         $this->config = (array) $site_config;
 
+        $this->builder->setPrefix(array('wp'));
+
         // Ensure that there is a custom array in the site config.
         if (!array_key_exists('custom', $this->config)) {
             $this->config['custom'] = array();
@@ -54,6 +56,7 @@ class Provisioner
         $this->downloadWordPress();
         $this->createWpConfig();
         $this->installWordPress();
+        $this->installPlugins();
         $this->createNginxConfig();
     }
 
@@ -78,6 +81,7 @@ class Provisioner
                 'locale'         => 'en_US',
                 'main_host'      => $main_host,
                 'hosts'          => $hosts,
+                'plugins'        => array(),
             )
         );
     }
@@ -170,7 +174,7 @@ define( 'JETPACK_STAGING_MODE', true );
 PHP;
 
         echo $this->getCmd(
-            array('wp', 'config', 'create'),
+            array('config', 'create'),
             array(
                 'force'     => null,
                 'dbname'    => $this->site_name,
@@ -194,7 +198,7 @@ PHP;
         }
 
         echo $this->getCmd(
-            array('wp', 'core', 'download'),
+            array('core', 'download'),
             array(
                 'locale'  => $this->site['locale'],
                 'version' => $this->site['version'],
@@ -223,11 +227,63 @@ PHP;
     }
 
     /**
+     * Install plugins for the site.
+     */
+    protected function installPlugins()
+    {
+        $plugins = $this->site['plugins'];
+        if (empty($plugins)) {
+            return;
+        }
+
+        // Change the prefix for the command builder.
+        $this->builder->setPrefix(array('wp', 'plugin', 'install'));
+
+        echo "Installing plugins...\n";
+        foreach ($plugins as $plugin) {
+            // If the plugin is just a string, we can install it with no other options.
+            if (is_string($plugin)) {
+                $cmd = $this->getCmd(array($plugin));
+            } elseif (is_array($plugin)) {
+                if (!isset($plugin['plugin'])) {
+                    continue;
+                }
+
+                // Grab the plugin name.
+                $plugin_name = $plugin['plugin'];
+
+                // Determine the plugin flags.
+                $plugin_flags = array_intersect_key(
+                    $plugin,
+                    array(
+                        'version'          => true,
+                        'force'            => true,
+                        'activate'         => true,
+                        'activate-network' => true,
+                    )
+                );
+
+                // Generate the command.
+                $cmd = $this->getCmd(array($plugin_name), $plugin_flags);
+            } else {
+                continue;
+            }
+
+            // Now run the command.
+            $cmd->run();
+            echo $cmd->getOutput();
+        }
+
+        // Restore the normal prefix.
+        $this->builder->setPrefix(array('wp'));
+    }
+
+    /**
      * Install WordPress in the database.
      */
     protected function installWordPress()
     {
-        $is_installed = $this->getCmd(array('wp', 'core', 'is-installed'))->run();
+        $is_installed = $this->getCmd(array('core', 'is-installed'))->run();
         if (0 !== $is_installed) {
             // Install WordPress.
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';

@@ -12,7 +12,6 @@ This project is intended to be a generic base repo for use with VVV2. All custom
 `custom` array for the site in the `vvv-custom.yml` file. Here's an example for one site:
 
 ```yml
----
 sites:
     example-site:
         repo: https://github.com/JPry/vvv-base.git
@@ -29,6 +28,11 @@ sites:
             xipio: true
             version: latest
             locale: en_US
+            plugins:
+                - jetpack
+                - { plugin: "redirect-emails-on-staging", activate: true }
+                - { plugin: "https://github.com/afragen/github-updater/archive/6.3.1.zip", force: true, activate: true }
+
 ```
 
 ## Options
@@ -76,3 +80,15 @@ The WordPress version to install. The default is `latest`.
 ### `locale`
 
 The locale to use when installing WordPress. The default is `en_US`.
+
+### `plugins`
+
+A list of plugins to install using WP CLI. There are two ways to specify what plugins to install:
+
+1. Use the plugin slug, zip, or url. This value can be anything [accepted by WP CLI](https://developer.wordpress.org/cli/commands/plugin/install/)
+1. Specify an array of options for a plugin. These options are specific to WP CLI. Available options are:
+ * `plugin` - The plugin slug, the path to a local zip file, or URL to a remote zip file.
+ * `version` - The particular version of the plugin to install. *(Note: This may only work for plugins from the wordpress.org repository)*
+ * `force` - Overwrite an existing installed version of the plugin.
+ * `activate` - Activate the plugin after installation.
+ * `activate-network` - *(Multisite only)* Network activate the plugin after installation.
