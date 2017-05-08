@@ -145,10 +145,9 @@ class Provisioner
     {
         echo "Setting up Nginx config\n";
         $provision_dir = dirname(__DIR__) . '/provision';
-        $nginx_config = "{$provision_dir}/vvv-nginx.conf";
-        $contents = !file_exists($nginx_config) ? file_get_contents(
-            "{$provision_dir}/vvv-nginx.template"
-        ) : file_get_contents($nginx_config);
+        $config = "{$provision_dir}/vvv-nginx.conf";
+        $template = "{$provision_dir}/vvv-nginx.template";
+        $contents = !file_exists($config) ? file_get_contents($template) : file_get_contents($config);
 
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
@@ -162,9 +161,14 @@ class Provisioner
             $nginx_hosts .= " {$nginx_xipio}";
         }
 
+        // If the hosts string is found in the file contents, don't try to replace it.
+        if (false !== strpos($contents, $nginx_hosts)) {
+            return;
+        }
+
         $contents = preg_replace('#(server_name\s*)(?:[^;]*);#', "\$1{$nginx_hosts};", $contents);
         $contents = str_replace('{wp_main_host}', $this->site['main_host'], $contents);
-        file_put_contents($nginx_config, $contents);
+        file_put_contents($config, $contents);
     }
 
     /**
