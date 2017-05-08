@@ -40,7 +40,7 @@ sites:
 
 ## Options
 
-All of the options for the `custom` array are not required. If any option is not provided, then the default will be used.
+None of the options for the `custom` array are not required. If any option is not provided, then the default will be used.
 
 ### `admin_user`
 
@@ -74,15 +74,15 @@ Whether to create a multisite installation. There are three valid values:
 
 ### `xipio`
 
-Whether to enable support for [xip.io](http://xip.io). This will set up the Nginx config to include the Xip.io version of the first domain.
+Whether to enable support for [xip.io](http://xip.io). This will set up the Nginx config to include the Xip.io version of the first domain. Defaults to `true`.
 
 ### `version`
 
-The WordPress version to install. The default is `latest`.
+The WordPress version to install. Defaults to `latest`.
 
 ### `locale`
 
-The locale to use when installing WordPress. The default is `en_US`.
+The locale to use when installing WordPress. Defaults to `en_US`.
 
 ### `plugins`
 
@@ -95,18 +95,29 @@ A list of plugins to install using WP CLI. There are two ways to specify what pl
  * `force` - Overwrite an existing installed version of the plugin.
  * `activate` - Activate the plugin after installation.
  * `activate-network` - *(Multisite only)* Network activate the plugin after installation.
- 
+
+Defaults to an empty array.
+
 ### `delete_default_plugins`
 
-Delete the default plugins. Currently these are Akismet and Hello Dolly.
+Delete the default plugins. Defaults to `false`. Currently "Akismet" and "Hello Dolly" are removed. 
 
 ### `delete_default_themes`
 
-Delete the default themes.
+Delete the default themes. Defaults to `false`. Currently the following themes are removed with this set:
+
+* `twentytwelve`
+* `twentythirteen`
+* `twentyfourteen`
+* `twentyfifteen`
+* `twentysixteen`
+* `twentyseventeen`
+
+
 
 ### `wp-content`
 
-Set a git repo to clone as the `htdocs/wp-content` directory.
+Set a git repo to clone as the `htdocs/wp-content` directory. Defaults to `false`.
 
 Using this option prevent the following options from having any effect:
 * `plugins`
