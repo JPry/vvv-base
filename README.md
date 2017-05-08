@@ -2,14 +2,16 @@
 
 Base repository for new VVV2 sites
 
-**Warning:** This is still a work-in-progress. Use at your own risk.
+**Warning:** This is still a work-in-progress. Use at your own risk. Please report any issues you may find.
+
+## Overview
 
 As of [version 2.0.0](https://varyingvagrantvagrants.org/blog/2017/03/13/varying-vagrant-vagrants-2-0-0.html) of VVV, 
 a `vvv-custom.yml` file can be created to conrol the configuration of sites. One of the config file [options](https://varyingvagrantvagrants.org/docs/en-US/vvv-config/)
 is the ability to define a repo that can be cloned to provide consistent site configuration.
 
 This project is intended to be a generic base repo for use with VVV2. All customizations should be done in the
-`custom` array for the site in the `vvv-custom.yml` file. Here's an example for one site:
+`custom` array for the site in the `vvv-custom.yml` file. Here's an example for one site, showing all available [options](#options):
 
 ```yml
 sites:
@@ -37,6 +39,24 @@ sites:
             wp-content: https://github.com/jquery/jquery-wp-content.git
 
 ```
+
+## Getting started
+
+To use this repository with VVV2, [create a new site in `vvv-custom.yml`](https://varyingvagrantvagrants.org/docs/en-US/vvv-config/). For the `repo` setting, specify this repository (`https://github.com/JPry/vvv-base.git`). This is all you need to get started:
+
+```yml
+sites:
+    example-site:
+        repo: https://github.com/JPry/vvv-base.git
+```
+
+Once that has been added to your `vvv-custom.yml` file, simply run a provision. It's easiest to provision only the site you just created using this command:
+
+```bash
+vagrant provision --provision-with site-example-site
+```
+
+Vagrant will generate the files in the filesystem for you, and configure the site based on the options below.
 
 ## Options
 
