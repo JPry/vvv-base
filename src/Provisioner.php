@@ -110,8 +110,8 @@ class Provisioner
     protected function createDB()
     {
         echo "Checking database for site...\n";
-        $result = $this->db->query("SHOW DATABASE LIKE '{$this->site_name}'");
-        if (empty($result)) {
+        $result = $this->db->query("SHOW DATABASES LIKE '{$this->site_name}'");
+        if (empty($result) || 0 === $result->num_rows) {
             echo "Creating DB for {$this->site_name}\n";
             $this->db->query("CREATE DATABASE `{$this->site_name}`;");
             echo "Granting privileges on DB...\n";
