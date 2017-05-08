@@ -40,7 +40,7 @@ sites:
 
 ## Options
 
-None of the options for the `custom` array are not required. If any option is not provided, then the default will be used.
+None of the options for the `custom` array are required. If any option is not provided, then the default will be used.
 
 ### `admin_user`
 
