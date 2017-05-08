@@ -172,6 +172,10 @@ class Provisioner
      */
     protected function createWpConfig()
     {
+        if (file_exists("{$this->vm_dir}/htdocs/wp-config.php")) {
+            return;
+        }
+
         $extra_php = <<<PHP
 define( 'WP_DEBUG', true );
 define( 'WP_DEBUG_DISPLAY', false );
@@ -184,7 +188,6 @@ PHP;
         echo $this->getCmd(
             array('wp', 'config', 'create'),
             array(
-                'force'     => null,
                 'dbname'    => $this->site_name,
                 'dbuser'    => 'wp',
                 'dbpass'    => 'wp',
