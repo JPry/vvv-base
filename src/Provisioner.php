@@ -354,6 +354,8 @@ PHP;
                 'admin_user'     => $this->site['admin_user'],
                 'admin_password' => $this->site['admin_password'],
                 'admin_email'    => $this->site['admin_email'],
+                'skip-plugins'   => null,
+                'skip-themes'    => null,
             );
 
             // Include the flag for subdomains if needed.
