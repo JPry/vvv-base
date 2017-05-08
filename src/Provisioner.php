@@ -35,8 +35,6 @@ class Provisioner
         $this->site_name = $site_name;
         $this->config = (array) $site_config;
 
-        $this->builder->setPrefix(array('wp'));
-
         // Ensure that there is a custom array in the site config.
         if (!array_key_exists('custom', $this->config)) {
             $this->config['custom'] = array();
@@ -55,10 +53,16 @@ class Provisioner
         $this->createBaseDir();
         $this->downloadWordPress();
         $this->createWpConfig();
-        $this->installWordPress();
-        $this->installPlugins();
-        $this->deleteDefaultContent();
         $this->createNginxConfig();
+        $this->installWordPress();
+
+        // Either do custom wp-content, or handle plugins/themes, but not both.
+        if ($this->hasWpContent()) {
+            $this->setupWpContent();
+        } else {
+            $this->installPlugins();
+            $this->deleteDefaultContent();
+        }
     }
 
     /**
@@ -85,6 +89,7 @@ class Provisioner
                 'plugins'                => array(),
                 'delete_default_plugins' => false,
                 'delete_default_themes'  => false,
+                'wp-content'             => false,
             )
         );
     }
@@ -177,7 +182,7 @@ define( 'JETPACK_STAGING_MODE', true );
 PHP;
 
         echo $this->getCmd(
-            array('config', 'create'),
+            array('wp', 'config', 'create'),
             array(
                 'force'     => null,
                 'dbname'    => $this->site_name,
@@ -203,7 +208,7 @@ PHP;
                 'hello',
             );
             foreach ($default_plugins as $plugin) {
-                $cmd = $this->getCmd(array('plugin', 'delete', $plugin));
+                $cmd = $this->getCmd(array('wp', 'plugin', 'delete', $plugin));
                 $cmd->run();
                 echo $cmd->getOutput();
             }
@@ -220,7 +225,7 @@ PHP;
                 'seventeen',
             );
             foreach ($default_themes as $theme) {
-                $cmd = $this->getCmd(array('theme', 'delete', "twenty{$theme}"));
+                $cmd = $this->getCmd(array('wp', 'theme', 'delete', "twenty{$theme}"));
                 $cmd->run();
                 echo $cmd->getOutput();
             }
@@ -237,7 +242,7 @@ PHP;
         }
 
         echo $this->getCmd(
-            array('core', 'download'),
+            array('wp', 'core', 'download'),
             array(
                 'locale'  => $this->site['locale'],
                 'version' => $this->site['version'],
@@ -263,6 +268,16 @@ PHP;
         }
 
         return $this->builder->getProcess();
+    }
+
+    /**
+     * Determine whether the site has custom wp-content.
+     *
+     * @return bool
+     */
+    protected function hasWpContent()
+    {
+        return (bool) $this->site['wp-content'];
     }
 
     /**
@@ -314,7 +329,7 @@ PHP;
         }
 
         // Restore the normal prefix.
-        $this->builder->setPrefix(array('wp'));
+        $this->builder->setPrefix(array());
     }
 
     /**
@@ -322,7 +337,7 @@ PHP;
      */
     protected function installWordPress()
     {
-        $is_installed = $this->getCmd(array('core', 'is-installed'))->run();
+        $is_installed = $this->getCmd(array('wp', 'core', 'is-installed'))->run();
         if (0 !== $is_installed) {
             // Install WordPress.
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
@@ -341,6 +356,62 @@ PHP;
 
             echo $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput();
         }
+    }
+
+    /**
+     * Set up a custom wp-content folder.
+     */
+    protected function setupWpContent()
+    {
+        if (!$this->hasWpContent()) {
+            return;
+        }
+
+        $this->removeDefaultWpContent();
+        $this->cloneWpContent();
+    }
+
+    /**
+     * Remove the default wp-content folder.
+     *
+     * This method will also create a check file in the site root so that the default
+     * directory is not removed on every provision.
+     */
+    protected function removeDefaultWpContent()
+    {
+        // Only continue if our check file isn't in place.
+        $check_file = "{$this->vm_dir}/removed-default-wp-content";
+        if (file_exists($check_file)) {
+            return;
+        }
+
+        echo "Removing default wp-content directory...\n";
+        echo $this->getCmd(array('rm', '-rf', "{$this->vm_dir}/htdocs/wp-content"))->mustRun()->getOutput();
+
+        echo "Creating check file [{$check_file}]...\n";
+        touch($check_file);
+    }
+
+    /**
+     * Clone the custom repo into the wp-content directory.
+     */
+    protected function cloneWpContent()
+    {
+        // Look for the existence of the .git directory.
+        if (file_exists("{$this->vm_dir}/htdocs/wp-content/.git")) {
+            return;
+        }
+
+        echo "Cloning [{$this->site['wp-content']}] into wp-content...\n";
+        $current = getcwd();
+        chdir("{$this->vm_dir}/htdocs");
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['wp-content'], 'wp-content'),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
+        chdir($current);
     }
 }
 

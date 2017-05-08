@@ -34,6 +34,7 @@ sites:
                 - { plugin: "https://github.com/afragen/github-updater/archive/6.3.1.zip", force: true, activate: true }
             delete_default_plugins: true
             delete_default_themes: true
+            wp-content: https://github.com/jquery/jquery-wp-content.git
 
 ```
 
@@ -102,3 +103,12 @@ Delete the default plugins. Currently these are Akismet and Hello Dolly.
 ### `delete_default_themes`
 
 Delete the default themes.
+
+### `wp-content`
+
+Set a git repo to clone as the `htdocs/wp-content` directory.
+
+Using this option prevent the following options from having any effect:
+* `plugins`
+* `delete_default_plugins`
+* `delete_default_themes`
