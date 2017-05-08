@@ -68,7 +68,7 @@ class Provisioner
     {
         $main_host = "{$this->site_name}.local";
         $hosts = array($main_host);
-        $this->site = new ArrayHelper($this->config['custom']);
+        $this->site = new DefaultsArray($this->config['custom']);
         $this->site->setDefaults(
             array(
                 'admin_user'             => 'admin',

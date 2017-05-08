@@ -6,7 +6,7 @@
 namespace JPry\VVVBase;
 
 
-class ArrayHelper implements \ArrayAccess
+class DefaultsArray implements \ArrayAccess
 {
     protected $data;
     protected $defaults;
