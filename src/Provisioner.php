@@ -346,7 +346,7 @@ PHP;
     {
         $is_installed = $this->getCmd(array('wp', 'core', 'is-installed'))->run();
         if (0 !== $is_installed) {
-            // Install WordPress.
+            echo "Installing WordPress...\n";
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
             $install_flags = array(
                 'url'            => $this->site['main_host'],
