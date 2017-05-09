@@ -5,7 +5,7 @@
 
 namespace JPry\VVVBase;
 
-
+use JPry\DefaultsArray;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\Process;
 

@@ -4,8 +4,46 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e6d610dfb7b7715bd6f9e50f6d80acd",
+    "content-hash": "9ada526795c5facd5ab5b4fdc919c6d4",
     "packages": [
+        {
+            "name": "jpry/array-defaults",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JPry/array-defaults.git",
+                "reference": "a42a7851db635091e4678c5b4db6471b97c16d92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JPry/array-defaults/zipball/a42a7851db635091e4678c5b4db6471b97c16d92",
+                "reference": "a42a7851db635091e4678c5b4db6471b97c16d92",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "JPry\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Pry",
+                    "email": "jeremy.pry@gmail.com",
+                    "homepage": "http://jeremypry.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Create arrays with default values",
+            "time": "2017-05-08T16:58:17+00:00"
+        },
         {
             "name": "symfony/process",
             "version": "v3.2.8",
