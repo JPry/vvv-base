@@ -8,4 +8,4 @@
 
 ## v0.1.0
 
-* Intitial working version
+* Initial working version
