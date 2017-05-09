@@ -70,8 +70,14 @@ class Provisioner
      */
     protected function setupSite()
     {
-        $main_host = "{$this->site_name}.local";
-        $hosts = array($main_host);
+        if (isset($this->config['hosts'])) {
+            $hosts = (array) $this->config['hosts'];
+            $main_host = $hosts[0];
+        } else {
+            $main_host = "{$this->site_name}.local";
+            $hosts = array($main_host);
+        }
+
         $this->site = new DefaultsArray($this->config['custom']);
         $this->site->setDefaults(
             array(
