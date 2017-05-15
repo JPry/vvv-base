@@ -34,6 +34,8 @@ sites:
                 - jetpack
                 - { plugin: "redirect-emails-on-staging", activate: true }
                 - { plugin: "https://github.com/afragen/github-updater/archive/6.3.1.zip", force: true, activate: true }
+            themes:
+                - twentyeleven
             delete_default_plugins: true
             delete_default_themes: true
             wp-content: https://github.com/jquery/jquery-wp-content.git
@@ -115,6 +117,19 @@ A list of plugins to install using WP CLI. There are two ways to specify what pl
  * `force` - Overwrite an existing installed version of the plugin.
  * `activate` - Activate the plugin after installation.
  * `activate-network` - *(Multisite only)* Network activate the plugin after installation.
+
+Defaults to an empty array.
+
+### `themes`
+
+A list of themes to install using WP CLI. There are two ways to specify what themes to install:
+
+1. Use the theme slug, zip, or url. This value can be anything [accepted by WP CLI](https://developer.wordpress.org/cli/commands/theme/install/)
+1. Specify an array of options for a theme. These options are specific to WP CLI. Available options are:
+ * `theme` - The theme slug, the path to a local zip file, or URL to a remote zip file.
+ * `version` - The particular version of the theme to install. *(Note: This may only work for themes from the wordpress.org repository)*
+ * `force` - Overwrite an existing installed version of the theme.
+ * `activate` - Activate the theme after installation.
 
 Defaults to an empty array.
 

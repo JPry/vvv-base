@@ -61,6 +61,7 @@ class Provisioner
             $this->setupWpContent();
         } else {
             $this->installPlugins();
+            $this->installThemes();
             $this->deleteDefaultContent();
         }
     }
@@ -93,6 +94,7 @@ class Provisioner
                 'main_host'              => $main_host,
                 'hosts'                  => $hosts,
                 'plugins'                => array(),
+                'themes'                 => array(),
                 'delete_default_plugins' => false,
                 'delete_default_themes'  => false,
                 'wp-content'             => false,
@@ -294,44 +296,54 @@ PHP;
     }
 
     /**
-     * Install plugins for the site.
+     * Helper to install plugins or themes.
+     *
+     * @param string $type  The type of item to install.
+     * @param array  $items Array of items to install.
+     *
+     * @throws \Exception When an invalid type is provided.
      */
-    protected function installPlugins()
+    protected function installHelper($type, $items)
     {
-        $plugins = $this->site['plugins'];
-        if (empty($plugins)) {
-            return;
+        $types = array(
+            'plugin' => true,
+            'theme'  => true,
+        );
+        if (!isset($types[$type])) {
+            throw new \Exception("Invalid installer type: {$type}");
         }
 
         // Change the prefix for the command builder.
-        $this->builder->setPrefix(array('wp', 'plugin', 'install'));
+        $this->builder->setPrefix(array('wp', $type, 'install'));
 
-        echo "Installing plugins...\n";
-        foreach ($plugins as $plugin) {
-            // If the plugin is just a string, we can install it with no other options.
-            if (is_string($plugin)) {
-                $cmd = $this->getCmd(array($plugin));
-            } elseif (is_array($plugin)) {
-                if (!isset($plugin['plugin'])) {
+        echo "Installing {$type}s...\n";
+        foreach ($items as $item) {
+            // If the item is just a string, we can install it with no other options.
+            if (is_string($item)) {
+                $cmd = $this->getCmd(array($item));
+            } elseif (is_array($item)) {
+                if (!isset($item[$type])) {
                     continue;
                 }
 
-                // Grab the plugin name.
-                $plugin_name = $plugin['plugin'];
+                // Grab the item name.
+                $name = $item[$type];
 
-                // Determine the plugin flags.
-                $plugin_flags = array_intersect_key(
-                    $plugin,
-                    array(
-                        'version'          => true,
-                        'force'            => true,
-                        'activate'         => true,
-                        'activate-network' => true,
-                    )
+                // Determine the item flags.
+                $valid_flags = array(
+                    'version'  => true,
+                    'force'    => true,
+                    'activate' => true,
                 );
 
+                if ('plugin' === $type) {
+                    $valid_flags['activate-network'] = true;
+                }
+
+                $item_flags = array_intersect_key($item, $valid_flags);
+
                 // Generate the command.
-                $cmd = $this->getCmd(array($plugin_name), $plugin_flags);
+                $cmd = $this->getCmd(array($name), $item_flags);
             } else {
                 continue;
             }
@@ -343,6 +355,32 @@ PHP;
 
         // Restore the normal prefix.
         $this->builder->setPrefix(array());
+    }
+
+    /**
+     * Install plugins for the site.
+     */
+    protected function installPlugins()
+    {
+        $plugins = $this->site['plugins'];
+        if (empty($plugins)) {
+            return;
+        }
+
+        $this->installHelper('plugin', $plugins);
+    }
+
+    /**
+     * Install themes for the site.
+     */
+    protected function installThemes()
+    {
+        $themes = $this->site['themes'];
+        if (empty($themes)) {
+            return;
+        }
+
+        $this->installHelper('theme', $themes);
     }
 
     /**
