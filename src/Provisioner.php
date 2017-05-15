@@ -160,11 +160,10 @@ class Provisioner
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
         if ($this->site['xipio']) {
-            $xipio_base = preg_replace('#(.*)\.[a-zA-Z0-9_]+$#', '$1', $this->site['main_host']);
             $nginx_xipio = str_replace(
                     '.',
                     '\\.',
-                    $xipio_base
+                    $this->getXipioBase()
                 ) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
             $nginx_hosts .= " {$nginx_xipio}";
         }
@@ -283,6 +282,22 @@ PHP;
         }
 
         return $this->builder->getProcess();
+    }
+
+    /**
+     * Get the base of the domain to use with Xip.io.
+     *
+     * The is formed by removing the top level domain from the host name.
+     *
+     * Examples:
+     * - example.com will become "example"
+     * - foo.bar.local will become "foo.bar"
+     *
+     * @return mixed
+     */
+    protected function getXipioBase()
+    {
+        return preg_replace('#(.*)\.[a-zA-Z0-9_]+$#', '$1', $this->site['main_host']);
     }
 
     /**
