@@ -7,7 +7,7 @@ Base repository for new VVV2 sites
 ## Overview
 
 As of [version 2.0.0](https://varyingvagrantvagrants.org/blog/2017/03/13/varying-vagrant-vagrants-2-0-0.html) of VVV, 
-a `vvv-custom.yml` file can be created to conrol the configuration of sites. One of the config file [options](https://varyingvagrantvagrants.org/docs/en-US/vvv-config/)
+a `vvv-custom.yml` file can be created to control the configuration of sites. One of the config file [options](https://varyingvagrantvagrants.org/docs/en-US/vvv-config/)
 is the ability to define a repo that can be cloned to provide consistent site configuration.
 
 This project is intended to be a generic base repo for use with VVV2. All customizations should be done in the
@@ -147,8 +147,6 @@ Delete the default themes. Defaults to `false`. Currently the following themes a
 * `twentyfifteen`
 * `twentysixteen`
 * `twentyseventeen`
-
-
 
 ### `wp-content`
 
