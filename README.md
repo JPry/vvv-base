@@ -39,6 +39,7 @@ sites:
             delete_default_plugins: true
             delete_default_themes: true
             wp-content: https://github.com/jquery/jquery-wp-content.git
+            wp: true
 
 ```
 
@@ -156,3 +157,9 @@ Using this option prevent the following options from having any effect:
 * `plugins`
 * `delete_default_plugins`
 * `delete_default_themes`
+
+### `wp`
+
+Whether to do any WordPress setup whatsoever. Defaults (naturally) to `true`.
+
+If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress.
