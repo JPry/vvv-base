@@ -39,6 +39,7 @@ sites:
             delete_default_plugins: true
             delete_default_themes: true
             wp-content: https://github.com/jquery/jquery-wp-content.git
+            download_wp: true
             wp: true
 
 ```
@@ -163,3 +164,9 @@ Using this option prevent the following options from having any effect:
 Whether to do any WordPress setup whatsoever. Defaults (naturally) to `true`.
 
 If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress.
+
+### `download_wp`
+
+Whether to download the WordPress files. Defaults to `true`.
+
+This is useful if you have some other method to install the WordPress files, such as using [WP Starter](https://github.com/wecodemore/wpstarter)

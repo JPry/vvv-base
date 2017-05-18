@@ -106,6 +106,7 @@ class Provisioner
                 'delete_default_themes'  => false,
                 'wp-content'             => false,
                 'wp'                     => true,
+                'download_wp'            => true,
             )
         );
 
