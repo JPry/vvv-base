@@ -54,6 +54,12 @@ class Provisioner
         $this->createLogs();
         $this->createBaseDir();
         $this->createNginxConfig();
+
+        if (!$this->site['wp']) {
+            echo "Skipping WordPress setup.\n\n";
+            return;
+        }
+
         $this->downloadWordPress();
         $this->createWpConfig();
         $this->installWordPress();
@@ -99,6 +105,7 @@ class Provisioner
                 'delete_default_plugins' => false,
                 'delete_default_themes'  => false,
                 'wp-content'             => false,
+                'wp'                     => true,
             )
         );
 
