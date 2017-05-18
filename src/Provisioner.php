@@ -53,9 +53,9 @@ class Provisioner
         $this->createDB();
         $this->createLogs();
         $this->createBaseDir();
+        $this->createNginxConfig();
         $this->downloadWordPress();
         $this->createWpConfig();
-        $this->createNginxConfig();
         $this->installWordPress();
         $this->cloneWpContent();
 
