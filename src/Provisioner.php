@@ -17,6 +17,8 @@ class Provisioner
     protected $site_name;
     protected $site;
     protected $vm_dir;
+    protected $base_dir;
+    protected $wp_content;
 
     /**
      * Provisioner constructor.
@@ -100,6 +102,9 @@ class Provisioner
                 'wp-content'             => false,
             )
         );
+
+        $this->base_dir = "{$this->vm_dir}/htdocs";
+        $this->wp_content = "{$this->base_dir}/wp-content";
     }
 
     /**
@@ -107,8 +112,8 @@ class Provisioner
      */
     protected function createBaseDir()
     {
-        if (!file_exists("{$this->vm_dir}/htdocs")) {
-            mkdir("{$this->vm_dir}/htdocs", 0775);
+        if (!file_exists("{$this->base_dir}")) {
+            mkdir("{$this->base_dir}", 0775, true);
         }
     }
 
@@ -183,7 +188,7 @@ class Provisioner
      */
     protected function createWpConfig()
     {
-        if (file_exists("{$this->vm_dir}/htdocs/wp-config.php")) {
+        if (file_exists("{$this->base_dir}/wp-config.php")) {
             return;
         }
 
@@ -251,7 +256,7 @@ PHP;
      */
     protected function downloadWordPress()
     {
-        if (file_exists("{$this->vm_dir}/htdocs/wp-admin")) {
+        if (file_exists("{$this->base_dir}/wp-admin") || !$this->site['download_wp']) {
             return;
         }
 
