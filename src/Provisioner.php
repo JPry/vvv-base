@@ -57,11 +57,10 @@ class Provisioner
         $this->createWpConfig();
         $this->createNginxConfig();
         $this->installWordPress();
+        $this->cloneWpContent();
 
-        // Either do custom wp-content, or handle plugins/themes, but not both.
-        if ($this->hasWpContent()) {
-            $this->setupWpContent();
-        } else {
+        // Only do plugins, themes, and default deletion if there's not custom content.
+        if (!$this->hasWpContent()) {
             $this->installPlugins();
             $this->installThemes();
             $this->deleteDefaultContent();
@@ -432,19 +431,6 @@ PHP;
     }
 
     /**
-     * Set up a custom wp-content folder.
-     */
-    protected function setupWpContent()
-    {
-        if (!$this->hasWpContent()) {
-            return;
-        }
-
-        $this->removeDefaultWpContent();
-        $this->cloneWpContent();
-    }
-
-    /**
      * Remove the default wp-content folder.
      *
      * This method will also create a check file in the site root so that the default
@@ -452,17 +438,10 @@ PHP;
      */
     protected function removeDefaultWpContent()
     {
-        // Only continue if our check file isn't in place.
-        $check_file = "{$this->vm_dir}/removed-default-wp-content";
-        if (file_exists($check_file)) {
-            return;
+        if (file_exists($this->wp_content)) {
+            echo "Removing default wp-content directory...\n";
+            echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
         }
-
-        echo "Removing default wp-content directory...\n";
-        echo $this->getCmd(array('rm', '-rf', "{$this->vm_dir}/htdocs/wp-content"))->mustRun()->getOutput();
-
-        echo "Creating check file [{$check_file}]...\n";
-        touch($check_file);
     }
 
     /**
@@ -471,20 +450,20 @@ PHP;
     protected function cloneWpContent()
     {
         // Look for the existence of the .git directory.
-        if (file_exists("{$this->vm_dir}/htdocs/wp-content/.git")) {
+        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
             return;
         }
 
+        // Maybe remove the default wp-content directory.
+        $this->removeDefaultWpContent();
+
         echo "Cloning [{$this->site['wp-content']}] into wp-content...\n";
-        $current = getcwd();
-        chdir("{$this->vm_dir}/htdocs");
         echo $this->getCmd(
-            array('git', 'clone', $this->site['wp-content'], 'wp-content'),
+            array('git', 'clone', $this->site['wp-content'], $this->wp_content),
             array(
                 'recursive' => null,
             )
         )->mustRun()->getOutput();
-        chdir($current);
     }
 }
 
