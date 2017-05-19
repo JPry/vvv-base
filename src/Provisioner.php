@@ -57,6 +57,7 @@ class Provisioner
 
         if (!$this->site['wp']) {
             echo "Skipping WordPress setup.\n\n";
+
             return;
         }
 
@@ -106,6 +107,7 @@ class Provisioner
                 'delete_default_themes'  => false,
                 'wp-content'             => false,
                 'wp'                     => true,
+                'download_wp'            => true,
             )
         );
 
