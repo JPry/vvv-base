@@ -64,4 +64,14 @@ class ProvisionerTest extends TestCase
 
         return $property;
     }
+
+
+    public function testSiteSetup()
+    {
+        $site  = $this->getPublicProperty('site');
+        $value = $site->getValue($this->provisioner);
+
+        $this->assertArrayNotHasKey('admin_user', $value);
+        $this->assertEquals('admin', $value['admin_user']);
+    }
 }
