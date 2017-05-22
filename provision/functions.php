@@ -57,7 +57,7 @@ function validate_flags($options)
 {
     $missing_flags = array_diff_key(array_flip(get_options()), $options);
     if (!empty($missing_flags)) {
-        throw new \Exception('Missing flags from command line: ' . join(', ', $missing_flags), 1);
+        throw new \Exception('Missing flags from command line: ' . join(', ', array_flip($missing_flags)), 1);
     }
 }
 
