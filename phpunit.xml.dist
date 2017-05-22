@@ -11,6 +11,10 @@
     <filter>
         <whitelist>
             <directory>./src</directory>
+            <directory>./provision</directory>
+            <exclude>
+                <directory>./provision/vendor</directory>
+            </exclude>
         </whitelist>
     </filter>
     <logging>
