@@ -2,4 +2,5 @@ vendor/
 htdocs/
 log/
 provision/vvv-nginx.conf
-removed-default-wp-content
+phpunit.xml
+code-coverage/

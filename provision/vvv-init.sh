@@ -3,8 +3,14 @@
 # Change to the parent directory to run scripts.
 cd "${VM_DIR}"
 
-# Ensure composer is installed
-noroot composer install
+# Install composer with --no-dev if this is a repo, otherwise use the regular install.
+if [[ false != "${REPO}" ]]; then
+    echo "Running composer with --no-dev"
+    noroot composer install --no-dev
+else
+    echo "Running composer"
+    noroot composer install
+fi
 
 noroot php provision/init.php \
 --vvv_path_to_site="${VVV_PATH_TO_SITE}" \
