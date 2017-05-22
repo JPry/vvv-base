@@ -31,11 +31,11 @@ class Provisioner
      */
     public function __construct(ProcessBuilder $builder, \mysqli $db, $vm_dir, $site_name, array $site_config)
     {
-        $this->builder = $builder;
-        $this->db = $db;
-        $this->vm_dir = $vm_dir;
+        $this->builder   = $builder;
+        $this->db        = $db;
+        $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
-        $this->config = (array) $site_config;
+        $this->config    = (array) $site_config;
 
         // Ensure that there is a custom array in the site config.
         if (!array_key_exists('custom', $this->config)) {
@@ -80,11 +80,11 @@ class Provisioner
     protected function setupSite()
     {
         if (isset($this->config['hosts'])) {
-            $hosts = (array) $this->config['hosts'];
+            $hosts     = (array) $this->config['hosts'];
             $main_host = $hosts[0];
         } else {
             $main_host = "{$this->site_name}.local";
-            $hosts = array($main_host);
+            $hosts     = array($main_host);
         }
 
         $this->site = new DefaultsArray($this->config['custom']);
@@ -105,13 +105,17 @@ class Provisioner
                 'themes'                 => array(),
                 'delete_default_plugins' => false,
                 'delete_default_themes'  => false,
-                'wp-content'             => false,
+                'wp_content'             => false,
                 'wp'                     => true,
                 'download_wp'            => true,
             )
         );
 
-        $this->base_dir = "{$this->vm_dir}/htdocs";
+        if (isset($this->site['wp-content'])) {
+            $this->site->setDefault('wp_content', $this->site['wp-content']);
+        }
+
+        $this->base_dir   = "{$this->vm_dir}/htdocs";
         $this->wp_content = "{$this->base_dir}/wp-content";
     }
 
@@ -166,18 +170,18 @@ class Provisioner
     {
         echo "Setting up Nginx config\n";
         $provision_dir = dirname(__DIR__) . '/provision';
-        $config = "{$provision_dir}/vvv-nginx.conf";
-        $template = "{$provision_dir}/vvv-nginx.template";
-        $contents = !file_exists($config) ? file_get_contents($template) : file_get_contents($config);
+        $config        = "{$provision_dir}/vvv-nginx.conf";
+        $template      = "{$provision_dir}/vvv-nginx.template";
+        $contents      = !file_exists($config) ? file_get_contents($template) : file_get_contents($config);
 
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
         if ($this->site['xipio']) {
             $nginx_xipio = str_replace(
-                    '.',
-                    '\\.',
-                    $this->getXipioBase()
-                ) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
+                               '.',
+                               '\\.',
+                               $this->getXipioBase()
+                           ) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
             $nginx_hosts .= " {$nginx_xipio}";
         }
 
@@ -314,13 +318,13 @@ PHP;
     }
 
     /**
-     * Determine whether the site has custom wp-content.
+     * Determine whether the site has custom wp_content.
      *
      * @return bool
      */
     protected function hasWpContent()
     {
-        return (bool) $this->site['wp-content'];
+        return (bool) $this->site['wp_content'];
     }
 
     /**
@@ -420,7 +424,7 @@ PHP;
         if (0 !== $is_installed) {
             echo "Installing WordPress...\n";
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
-            $install_flags = array(
+            $install_flags   = array(
                 'url'            => $this->site['main_host'],
                 'title'          => $this->site['title'],
                 'admin_user'     => $this->site['admin_user'],
@@ -466,9 +470,9 @@ PHP;
         // Maybe remove the default wp-content directory.
         $this->removeDefaultWpContent();
 
-        echo "Cloning [{$this->site['wp-content']}] into wp-content...\n";
+        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
         echo $this->getCmd(
-            array('git', 'clone', $this->site['wp-content'], $this->wp_content),
+            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
             array(
                 'recursive' => null,
             )

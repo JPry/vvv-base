@@ -151,6 +151,10 @@ Delete the default themes. Defaults to `false`. Currently the following themes a
 
 ### `wp-content`
 
+Deprecated. Use `wp_content`.
+
+### `wp_content`
+
 Set a git repo to clone as the `htdocs/wp-content` directory. Defaults to `false`.
 
 Using this option prevent the following options from having any effect:
