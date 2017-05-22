@@ -18,7 +18,6 @@ class FunctionsTest extends TestCase
 
     public function testFlags()
     {
-        $flags = get_flags();
         $expected = array(
             'site:',
             'site_escaped:',
@@ -26,13 +25,13 @@ class FunctionsTest extends TestCase
             'vvv_path_to_site:',
             'vvv_config:',
         );
-        $this->assertEquals($expected, $flags);
+        $this->assertEquals($expected, get_flags());
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException        \Exception
      * @expectedExceptionMessage Missing flags from command line: site, site_escaped, vm_dir, vvv_path_to_site, vvv_config
-     * @expectedExceptionCode 1
+     * @expectedExceptionCode    1
      */
     public function testValidateFlagsEmpty()
     {
@@ -48,9 +47,9 @@ class FunctionsTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException        \Exception
      * @expectedExceptionMessage Cannot find site in config: testValidateSiteMissing
-     * @expectedExceptionCode 2
+     * @expectedExceptionCode    2
      */
     public function testValidateSiteMissing()
     {
