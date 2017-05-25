@@ -57,13 +57,28 @@ class Provisioner
 
         if (!$this->site['wp']) {
             echo "Skipping WordPress setup.\n\n";
-
             return;
         }
 
         $this->downloadWordPress();
         $this->createWpConfig();
         $this->installWordPress();
+
+        if ($this->hasHtdocs()) {
+            return;
+        }
+
+        $this->provisionContent();
+    }
+
+    /**
+     * Provision the content within the site.
+     *
+     * This will either clone the wp-content directory, or else use custom options to install/delete
+     * plugins and themes.
+     */
+    public function provisionContent()
+    {
         $this->cloneWpContent();
 
         // Only do plugins, themes, and default deletion if there's not custom content.
