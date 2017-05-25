@@ -5,3 +5,7 @@ machine:
 test:
     override:
         - ./provision/vendor/bin/phpunit
+
+general:
+    artifacts:
+        - "code-coverage"
