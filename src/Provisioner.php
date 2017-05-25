@@ -318,7 +318,17 @@ PHP;
     }
 
     /**
-     * Determine whether the site has custom wp_content.
+     * Determine whether the site has custom htdocs repository.
+     *
+     * @return bool
+     */
+    protected function hasHtdocs()
+    {
+        return (bool) $this->site['htdocs'];
+    }
+
+    /**
+     * Determine whether the site has custom wp-content repository.
      *
      * @return bool
      */
