@@ -38,7 +38,7 @@ sites:
                 - twentyeleven
             delete_default_plugins: true
             delete_default_themes: true
-            wp-content: https://github.com/jquery/jquery-wp-content.git
+            wp_content: https://github.com/jquery/jquery-wp-content.git
             wp: true
 
 ```
