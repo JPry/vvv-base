@@ -135,6 +135,28 @@ class Provisioner
     }
 
     /**
+     * Clone the custom repo into the htdocs/ directory.
+     */
+    protected function cloneHtdocs()
+    {
+        // Look for the existence of the .git directory.
+        if (file_exists("{$this->base_dir}/.git") && is_dir("{$this->base_dir}/.git")) {
+            return;
+        }
+
+        // If we already have the htdocs dir, remove it.
+        $this->removeDefaultHtdocs();
+
+        echo "Cloning [{$this->site['htdocs']}] into {$this->base_dir}...\n";
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['htdocs'], $this->base_dir),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
+    }
+
+    /**
      * Create the base htdocs directory if needed.
      */
     protected function createBaseDir()
