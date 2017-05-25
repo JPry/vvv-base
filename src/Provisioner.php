@@ -497,6 +497,17 @@ PHP;
     }
 
     /**
+     * Remove the default htdocs directory.
+     */
+    protected function removeDefaultHtdocs()
+    {
+        if (file_exists($this->base_dir)) {
+            echo "Removing default htdocs directory...\n";
+            echo $this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput();
+        }
+    }
+
+    /**
      * Remove the default wp-content folder.
      *
      * This method will also create a check file in the site root so that the default
