@@ -162,8 +162,11 @@ class Provisioner
      */
     protected function createBaseDir()
     {
-        if (!file_exists("{$this->base_dir}")) {
-            mkdir("{$this->base_dir}", 0775, true);
+        if ($this->hasHtdocs()) {
+            $this->cloneHtdocs();
+        }
+        elseif (!file_exists($this->base_dir)) {
+            mkdir($this->base_dir, 0775, true);
         }
     }
 
@@ -306,6 +309,8 @@ PHP;
      */
     protected function downloadWordPress()
     {
+        // todo: handle htdocs repo
+
         if (file_exists("{$this->base_dir}/wp-admin") || !$this->site['download_wp']) {
             return;
         }
