@@ -123,6 +123,7 @@ class Provisioner
                 'wp_content'             => false,
                 'wp'                     => true,
                 'download_wp'            => true,
+                'htdocs'                 => false,
             )
         );
 
