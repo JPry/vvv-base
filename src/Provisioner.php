@@ -57,13 +57,28 @@ class Provisioner
 
         if (!$this->site['wp']) {
             echo "Skipping WordPress setup.\n\n";
-
             return;
         }
 
         $this->downloadWordPress();
         $this->createWpConfig();
         $this->installWordPress();
+
+        if ($this->hasHtdocs()) {
+            return;
+        }
+
+        $this->provisionContent();
+    }
+
+    /**
+     * Provision the content within the site.
+     *
+     * This will either clone the wp-content directory, or else use custom options to install/delete
+     * plugins and themes.
+     */
+    public function provisionContent()
+    {
         $this->cloneWpContent();
 
         // Only do plugins, themes, and default deletion if there's not custom content.
@@ -108,6 +123,7 @@ class Provisioner
                 'wp_content'             => false,
                 'wp'                     => true,
                 'download_wp'            => true,
+                'htdocs'                 => false,
             )
         );
 
@@ -120,12 +136,58 @@ class Provisioner
     }
 
     /**
+     * Clone the custom repo into the htdocs/ directory.
+     */
+    protected function cloneHtdocs()
+    {
+        // Look for the existence of the .git directory.
+        if (file_exists("{$this->base_dir}/.git") && is_dir("{$this->base_dir}/.git")) {
+            return;
+        }
+
+        // If we already have the htdocs dir, remove it.
+        $this->removeDefaultHtdocs();
+
+        echo "Cloning [{$this->site['htdocs']}] into {$this->base_dir}...\n";
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['htdocs'], $this->base_dir),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
+    }
+
+    /**
+     * Clone the custom repo into the wp-content directory.
+     */
+    protected function cloneWpContent()
+    {
+        // Look for the existence of the .git directory.
+        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
+            return;
+        }
+
+        // Maybe remove the default wp-content directory.
+        $this->removeDefaultWpContent();
+
+        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
+    }
+
+    /**
      * Create the base htdocs directory if needed.
      */
     protected function createBaseDir()
     {
-        if (!file_exists("{$this->base_dir}")) {
-            mkdir("{$this->base_dir}", 0775, true);
+        if ($this->hasHtdocs()) {
+            $this->cloneHtdocs();
+        } elseif (!file_exists($this->base_dir)) {
+            mkdir($this->base_dir, 0775, true);
         }
     }
 
@@ -268,6 +330,8 @@ PHP;
      */
     protected function downloadWordPress()
     {
+        // todo: handle htdocs repo
+
         if (file_exists("{$this->base_dir}/wp-admin") || !$this->site['download_wp']) {
             return;
         }
@@ -318,7 +382,17 @@ PHP;
     }
 
     /**
-     * Determine whether the site has custom wp_content.
+     * Determine whether the site has custom htdocs repository.
+     *
+     * @return bool
+     */
+    protected function hasHtdocs()
+    {
+        return (bool) $this->site['htdocs'];
+    }
+
+    /**
+     * Determine whether the site has custom wp-content repository.
      *
      * @return bool
      */
@@ -444,10 +518,18 @@ PHP;
     }
 
     /**
+     * Remove the default htdocs directory.
+     */
+    protected function removeDefaultHtdocs()
+    {
+        if (file_exists($this->base_dir)) {
+            echo "Removing default htdocs directory...\n";
+            echo $this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput();
+        }
+    }
+
+    /**
      * Remove the default wp-content folder.
-     *
-     * This method will also create a check file in the site root so that the default
-     * directory is not removed on every provision.
      */
     protected function removeDefaultWpContent()
     {
@@ -455,28 +537,6 @@ PHP;
             echo "Removing default wp-content directory...\n";
             echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
         }
-    }
-
-    /**
-     * Clone the custom repo into the wp-content directory.
-     */
-    protected function cloneWpContent()
-    {
-        // Look for the existence of the .git directory.
-        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
-            return;
-        }
-
-        // Maybe remove the default wp-content directory.
-        $this->removeDefaultWpContent();
-
-        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
-        echo $this->getCmd(
-            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
-            array(
-                'recursive' => null,
-            )
-        )->mustRun()->getOutput();
     }
 }
 
