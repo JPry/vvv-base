@@ -509,9 +509,6 @@ PHP;
 
     /**
      * Remove the default wp-content folder.
-     *
-     * This method will also create a check file in the site root so that the default
-     * directory is not removed on every provision.
      */
     protected function removeDefaultWpContent()
     {
