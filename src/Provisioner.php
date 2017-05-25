@@ -186,8 +186,7 @@ class Provisioner
     {
         if ($this->hasHtdocs()) {
             $this->cloneHtdocs();
-        }
-        elseif (!file_exists($this->base_dir)) {
+        } elseif (!file_exists($this->base_dir)) {
             mkdir($this->base_dir, 0775, true);
         }
     }
