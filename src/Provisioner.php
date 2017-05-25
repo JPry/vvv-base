@@ -158,6 +158,28 @@ class Provisioner
     }
 
     /**
+     * Clone the custom repo into the wp-content directory.
+     */
+    protected function cloneWpContent()
+    {
+        // Look for the existence of the .git directory.
+        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
+            return;
+        }
+
+        // Maybe remove the default wp-content directory.
+        $this->removeDefaultWpContent();
+
+        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
+    }
+
+    /**
      * Create the base htdocs directory if needed.
      */
     protected function createBaseDir()
@@ -516,28 +538,6 @@ PHP;
             echo "Removing default wp-content directory...\n";
             echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
         }
-    }
-
-    /**
-     * Clone the custom repo into the wp-content directory.
-     */
-    protected function cloneWpContent()
-    {
-        // Look for the existence of the .git directory.
-        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
-            return;
-        }
-
-        // Maybe remove the default wp-content directory.
-        $this->removeDefaultWpContent();
-
-        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
-        echo $this->getCmd(
-            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
-            array(
-                'recursive' => null,
-            )
-        )->mustRun()->getOutput();
     }
 }
 
