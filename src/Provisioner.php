@@ -35,7 +35,7 @@ class Provisioner
         $this->db        = $db;
         $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
-        $this->config    = (array) $site_config;
+        $this->config    = (array)$site_config;
 
         // Ensure that there is a custom array in the site config.
         if (!array_key_exists('custom', $this->config)) {
@@ -57,6 +57,7 @@ class Provisioner
 
         if (!$this->site['wp']) {
             echo "Skipping WordPress setup.\n\n";
+
             return;
         }
 
@@ -95,7 +96,7 @@ class Provisioner
     protected function setupSite()
     {
         if (isset($this->config['hosts'])) {
-            $hosts     = (array) $this->config['hosts'];
+            $hosts     = (array)$this->config['hosts'];
             $main_host = $hosts[0];
         } else {
             $main_host = "{$this->site_name}.local";
@@ -239,11 +240,8 @@ class Provisioner
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
         if ($this->site['xipio']) {
-            $nginx_xipio = str_replace(
-                               '.',
-                               '\\.',
-                               $this->getXipioBase()
-                           ) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
+            $nginx_xipio = str_replace('.', '\\.', $this->getXipioBase());
+            $nginx_xipio .= '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
             $nginx_hosts .= " {$nginx_xipio}";
         }
 
@@ -388,7 +386,7 @@ PHP;
      */
     protected function hasHtdocs()
     {
-        return (bool) $this->site['htdocs'];
+        return (bool)$this->site['htdocs'];
     }
 
     /**
@@ -398,7 +396,7 @@ PHP;
      */
     protected function hasWpContent()
     {
-        return (bool) $this->site['wp_content'];
+        return (bool)$this->site['wp_content'];
     }
 
     /**

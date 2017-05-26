@@ -5,7 +5,6 @@
 
 namespace JPry\VVVBase;
 
-
 use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase

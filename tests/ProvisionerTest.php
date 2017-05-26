@@ -5,7 +5,6 @@
 
 namespace JPry\VVVBase;
 
-
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ProcessBuilder;
 
