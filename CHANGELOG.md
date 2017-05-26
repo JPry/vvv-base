@@ -7,9 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## v0.3.0 - 2017-05-26
 
 Added
+* `htdocs` option to allow for a Git repo of the entire `htdocs/` directory
+* `themes` option to allow for automated installation of themes
+* `wp` option to allow for skipping WordPress installation entirely
 * Unit Tests
 * [Contribution guidelines](https://github.com/JPry/vvv-base/blob/develop/.github/CONTRIBUTING.md)
-* `htdocs` option
 * [Circle CI](https://circleci.com/gh/JPry/vvv-base) integration for testing
 
 Changed
