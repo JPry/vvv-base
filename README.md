@@ -38,8 +38,9 @@ sites:
                 - twentyeleven
             delete_default_plugins: true
             delete_default_themes: true
-            wp-content: https://github.com/jquery/jquery-wp-content.git
+            wp_content: https://github.com/jquery/jquery-wp-content.git
             wp: true
+            htdocs: https://github.com/salcode/example-project-w-gitignore.git
 
 ```
 
@@ -151,12 +152,29 @@ Delete the default themes. Defaults to `false`. Currently the following themes a
 
 ### `wp-content`
 
+Deprecated. Use `wp_content`.
+
+### `wp_content`
+
 Set a git repo to clone as the `htdocs/wp-content` directory. Defaults to `false`.
 
 Using this option prevent the following options from having any effect:
 * `plugins`
+* `themes`
 * `delete_default_plugins`
 * `delete_default_themes`
+
+### `htdocs`
+
+Similar to the `wp_content` setting, use this option to set a Git repo to clone as the root `htdocs/` directory. Defaults to `false`.
+
+Using this option prevent the following options from having any effect:
+* `wp_content`
+* `plugins`
+* `themes`
+* `delete_default_plugins`
+* `delete_default_themes`
+* `wp`
 
 ### `wp`
 

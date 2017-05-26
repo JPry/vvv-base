@@ -31,11 +31,11 @@ class Provisioner
      */
     public function __construct(ProcessBuilder $builder, \mysqli $db, $vm_dir, $site_name, array $site_config)
     {
-        $this->builder = $builder;
-        $this->db = $db;
-        $this->vm_dir = $vm_dir;
+        $this->builder   = $builder;
+        $this->db        = $db;
+        $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
-        $this->config = (array) $site_config;
+        $this->config    = (array)$site_config;
 
         // Ensure that there is a custom array in the site config.
         if (!array_key_exists('custom', $this->config)) {
@@ -64,6 +64,22 @@ class Provisioner
         $this->downloadWordPress();
         $this->createWpConfig();
         $this->installWordPress();
+
+        if ($this->hasHtdocs()) {
+            return;
+        }
+
+        $this->provisionContent();
+    }
+
+    /**
+     * Provision the content within the site.
+     *
+     * This will either clone the wp-content directory, or else use custom options to install/delete
+     * plugins and themes.
+     */
+    public function provisionContent()
+    {
         $this->cloneWpContent();
 
         // Only do plugins, themes, and default deletion if there's not custom content.
@@ -80,11 +96,11 @@ class Provisioner
     protected function setupSite()
     {
         if (isset($this->config['hosts'])) {
-            $hosts = (array) $this->config['hosts'];
+            $hosts     = (array)$this->config['hosts'];
             $main_host = $hosts[0];
         } else {
             $main_host = "{$this->site_name}.local";
-            $hosts = array($main_host);
+            $hosts     = array($main_host);
         }
 
         $this->site = new DefaultsArray($this->config['custom']);
@@ -105,14 +121,63 @@ class Provisioner
                 'themes'                 => array(),
                 'delete_default_plugins' => false,
                 'delete_default_themes'  => false,
-                'wp-content'             => false,
+                'wp_content'             => false,
                 'wp'                     => true,
                 'download_wp'            => true,
+                'htdocs'                 => false,
             )
         );
 
-        $this->base_dir = "{$this->vm_dir}/htdocs";
+        if (isset($this->site['wp-content'])) {
+            $this->site->setDefault('wp_content', $this->site['wp-content']);
+        }
+
+        $this->base_dir   = "{$this->vm_dir}/htdocs";
         $this->wp_content = "{$this->base_dir}/wp-content";
+    }
+
+    /**
+     * Clone the custom repo into the htdocs/ directory.
+     */
+    protected function cloneHtdocs()
+    {
+        // Look for the existence of the .git directory.
+        if (file_exists("{$this->base_dir}/.git") && is_dir("{$this->base_dir}/.git")) {
+            return;
+        }
+
+        // If we already have the htdocs dir, remove it.
+        $this->removeDefaultHtdocs();
+
+        echo "Cloning [{$this->site['htdocs']}] into {$this->base_dir}...\n";
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['htdocs'], $this->base_dir),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
+    }
+
+    /**
+     * Clone the custom repo into the wp-content directory.
+     */
+    protected function cloneWpContent()
+    {
+        // Look for the existence of the .git directory.
+        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
+            return;
+        }
+
+        // Maybe remove the default wp-content directory.
+        $this->removeDefaultWpContent();
+
+        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
+        echo $this->getCmd(
+            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
+            array(
+                'recursive' => null,
+            )
+        )->mustRun()->getOutput();
     }
 
     /**
@@ -120,8 +185,10 @@ class Provisioner
      */
     protected function createBaseDir()
     {
-        if (!file_exists("{$this->base_dir}")) {
-            mkdir("{$this->base_dir}", 0775, true);
+        if ($this->hasHtdocs()) {
+            $this->cloneHtdocs();
+        } elseif (!file_exists($this->base_dir)) {
+            mkdir($this->base_dir, 0775, true);
         }
     }
 
@@ -166,18 +233,15 @@ class Provisioner
     {
         echo "Setting up Nginx config\n";
         $provision_dir = dirname(__DIR__) . '/provision';
-        $config = "{$provision_dir}/vvv-nginx.conf";
-        $template = "{$provision_dir}/vvv-nginx.template";
-        $contents = !file_exists($config) ? file_get_contents($template) : file_get_contents($config);
+        $config        = "{$provision_dir}/vvv-nginx.conf";
+        $template      = "{$provision_dir}/vvv-nginx.template";
+        $contents      = !file_exists($config) ? file_get_contents($template) : file_get_contents($config);
 
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
         if ($this->site['xipio']) {
-            $nginx_xipio = str_replace(
-                    '.',
-                    '\\.',
-                    $this->getXipioBase()
-                ) . '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
+            $nginx_xipio = str_replace('.', '\\.', $this->getXipioBase());
+            $nginx_xipio .= '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
             $nginx_hosts .= " {$nginx_xipio}";
         }
 
@@ -264,6 +328,8 @@ PHP;
      */
     protected function downloadWordPress()
     {
+        // todo: handle htdocs repo
+
         if (file_exists("{$this->base_dir}/wp-admin") || !$this->site['download_wp']) {
             return;
         }
@@ -314,13 +380,23 @@ PHP;
     }
 
     /**
-     * Determine whether the site has custom wp-content.
+     * Determine whether the site has custom htdocs repository.
+     *
+     * @return bool
+     */
+    protected function hasHtdocs()
+    {
+        return (bool)$this->site['htdocs'];
+    }
+
+    /**
+     * Determine whether the site has custom wp-content repository.
      *
      * @return bool
      */
     protected function hasWpContent()
     {
-        return (bool) $this->site['wp-content'];
+        return (bool)$this->site['wp_content'];
     }
 
     /**
@@ -420,7 +496,7 @@ PHP;
         if (0 !== $is_installed) {
             echo "Installing WordPress...\n";
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
-            $install_flags = array(
+            $install_flags   = array(
                 'url'            => $this->site['main_host'],
                 'title'          => $this->site['title'],
                 'admin_user'     => $this->site['admin_user'],
@@ -440,10 +516,18 @@ PHP;
     }
 
     /**
+     * Remove the default htdocs directory.
+     */
+    protected function removeDefaultHtdocs()
+    {
+        if (file_exists($this->base_dir)) {
+            echo "Removing default htdocs directory...\n";
+            echo $this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput();
+        }
+    }
+
+    /**
      * Remove the default wp-content folder.
-     *
-     * This method will also create a check file in the site root so that the default
-     * directory is not removed on every provision.
      */
     protected function removeDefaultWpContent()
     {
@@ -451,28 +535,6 @@ PHP;
             echo "Removing default wp-content directory...\n";
             echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
         }
-    }
-
-    /**
-     * Clone the custom repo into the wp-content directory.
-     */
-    protected function cloneWpContent()
-    {
-        // Look for the existence of the .git directory.
-        if (!$this->hasWpContent() || file_exists("{$this->wp_content}/.git")) {
-            return;
-        }
-
-        // Maybe remove the default wp-content directory.
-        $this->removeDefaultWpContent();
-
-        echo "Cloning [{$this->site['wp-content']}] into wp-content...\n";
-        echo $this->getCmd(
-            array('git', 'clone', $this->site['wp-content'], $this->wp_content),
-            array(
-                'recursive' => null,
-            )
-        )->mustRun()->getOutput();
     }
 }
 

@@ -11,6 +11,11 @@
             "JPry\\VVVBase\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "JPry\\VVVBase\\": "tests/"
+        }
+    },
     "require": {
         "symfony/yaml": "^3.2",
         "symfony/process": "^3.2",
@@ -18,5 +23,9 @@
     },
     "config": {
         "vendor-dir": "provision/vendor"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.1",
+        "mikey179/vfsStream": "^1"
     }
 }
