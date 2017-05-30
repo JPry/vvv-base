@@ -6,10 +6,10 @@ cd "${VM_DIR}"
 # Install composer with --no-dev if this is a repo, otherwise use the regular install.
 if [[ false != "${REPO}" ]]; then
     echo "Running composer with --no-dev"
-    noroot composer install --no-dev
+    noroot composer install --no-dev --no-suggest --no-interaction
 else
     echo "Running composer"
-    noroot composer install
+    noroot composer install --no-interaction
 fi
 
 noroot php provision/init.php \
