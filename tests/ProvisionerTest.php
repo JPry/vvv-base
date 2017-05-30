@@ -110,4 +110,14 @@ class ProvisionerTest extends TestCase
         $createBaseDir->invoke($this->provisioner);
         $this->assertTrue($this->root->hasChild('htdocs'));
     }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Invalid installer type: provisiontest
+     */
+    public function testInstallHelperException()
+    {
+        $helper = $this->getPublicMethod('installHelper');
+        $helper->invoke($this->provisioner, 'provisiontest', array());
+    }
 }
