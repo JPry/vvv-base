@@ -5,6 +5,8 @@
 
 namespace JPry\VVVBase;
 
+use Monolog\Handler\NullHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -40,7 +42,8 @@ class ProvisionerTest extends TestCase
             $this->db_mock,
             '/tmp/provision-test',
             'provision-test',
-            array()
+            array(),
+            new Logger('provisionTest', array(new NullHandler()))
         );
     }
 
