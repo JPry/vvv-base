@@ -19,7 +19,8 @@
     "require": {
         "symfony/yaml": "^3.2",
         "symfony/process": "^3.2",
-        "jpry/array-defaults": "^1.0"
+        "jpry/array-defaults": "^1.0",
+        "monolog/monolog": "^1.22"
     },
     "config": {
         "vendor-dir": "provision/vendor"
