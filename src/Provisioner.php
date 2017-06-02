@@ -123,7 +123,7 @@ class Provisioner
     protected function setupSite()
     {
         if (isset($this->config['hosts'])) {
-            $hosts     = (array)$this->config['hosts'];
+            $hosts     = (array) $this->config['hosts'];
             $main_host = $hosts[0];
         } else {
             $main_host = "{$this->site_name}.local";
@@ -413,7 +413,7 @@ PHP;
      */
     protected function hasHtdocs()
     {
-        return (bool)$this->site['htdocs'];
+        return (bool) $this->site['htdocs'];
     }
 
     /**
@@ -423,7 +423,7 @@ PHP;
      */
     protected function hasWpContent()
     {
-        return (bool)$this->site['wp_content'];
+        return (bool) $this->site['wp_content'];
     }
 
     /**
