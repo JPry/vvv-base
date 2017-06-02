@@ -26,11 +26,6 @@ class ProvisionerTest extends TestCase
     protected $root;
 
 
-    public static function setUpBeforeClass()
-    {
-
-    }
-
     public function setUp()
     {
         // Wrap filesystem stream for cleaner testing.
@@ -48,7 +43,7 @@ class ProvisionerTest extends TestCase
         $this->provisioner = new Provisioner(
             new ProcessBuilder(),
             $this->db_mock,
-            '/tmp/provision-test',
+            $this->root->url(),
             'provision-test',
             array(),
             new Logger('provisionTest', array(new NullHandler()))
