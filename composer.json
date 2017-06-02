@@ -27,6 +27,15 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^6.1",
-        "mikey179/vfsStream": "^1"
+        "mikey179/vfsStream": "^1",
+        "wp-cli/wp-cli": "^1.1"
+    },
+    "repositories": [
+
+    ],
+    "extra": {
+        "autoload-splitter": {
+            "splitter-location": "provision/vendor/wp-cli/wp-cli/php/WP_CLI/AutoloadSplitter.php"
+        }
     }
 }
