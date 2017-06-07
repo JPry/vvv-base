@@ -1,8 +1,12 @@
 # vvv-base
 
+![circle ci status badge](https://circleci.com/gh/JPry/vvv-base/tree/develop.svg?style=shield&circle-token=2a4b06e9259652a98d26b701ab76636f38d95cc8)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/JPry/vvv-base.svg)](http://isitmaintained.com/project/JPry/vvv-base "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/JPry/vvv-base.svg)](http://isitmaintained.com/project/JPry/vvv-base "Percentage of issues still open")
+
 Base repository for new VVV2 sites
 
-**Warning:** This is still a work-in-progress. Use at your own risk. Please report any issues you may find.
+Please [report any issues](https://github.com/JPry/vvv-base/issues) you may find.
 
 ## Overview
 
