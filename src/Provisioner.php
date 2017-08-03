@@ -334,8 +334,6 @@ PHP;
             return;
         }
 
-        echo "Using locale: ".$this->site['locale'];
-        echo "Using version: ".$this->site['version'];
         echo $this->getCmd(
             array('wp', 'core', 'download'),
             array(
