@@ -110,7 +110,7 @@ class Provisioner
                 'admin_password'         => 'password',
                 'admin_email'            => 'admin@localhost.local',
                 'title'                  => 'My Awesome VVV Site',
-                'prefix'                 => 'wp_',
+                'dbprefix'               => 'wp_',
                 'multisite'              => false,
                 'xipio'                  => true,
                 'version'                => 'latest',
@@ -280,8 +280,8 @@ PHP;
                 'dbuser'    => 'wp',
                 'dbpass'    => 'wp',
                 'dbhost'    => 'localhost',
-                'dbprefix'  => $this->site['prefix'],
-                'locale'    => 'en_US',
+                'dbprefix'  => $this->site['dbprefix'],
+                'locale'    => $this->site['locale'],
                 'extra-php' => $extra_php,
             )
         )->mustRun()->getOutput();
