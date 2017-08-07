@@ -185,3 +185,7 @@ Using this option prevent the following options from having any effect:
 Whether to do any WordPress setup whatsoever. Defaults (naturally) to `true`.
 
 If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress.
+
+## Contributing
+
+Contributions are welcome! Please see our [Contribution guidelines](https://github.com/JPry/vvv-base/blob/develop/.github/CONTRIBUTING.md).
