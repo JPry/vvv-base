@@ -10,6 +10,7 @@ use Monolog\Logger;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 class ProvisionerTest extends TestCase
@@ -114,5 +115,24 @@ class ProvisionerTest extends TestCase
     {
         $helper = $this->getPublicMethod('installHelper');
         $helper->invoke($this->provisioner, 'provisiontest', array());
+    }
+
+
+    public function testGetCmd()
+    {
+        $getCmd = $this->getPublicMethod('getCmd');
+
+        // Ensure proper handling of different values
+        /** @var Process $result */
+        $result = $getCmd->invoke(
+            $this->provisioner,
+            array('foo'),
+            array(
+                'bar' => false,
+                'baz' => 'some value',
+                'boo' => null,
+            )
+        );
+        $this->assertEquals("'foo' '--baz=some value' '--boo'", $result->getCommandLine());
     }
 }
