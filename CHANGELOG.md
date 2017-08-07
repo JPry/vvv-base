@@ -7,14 +7,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## next_release - date
 
 Added
-* Support for [`.editorconfig`](http://editorconfig.org) (Props @salcode)
-* More thorough unit testing
-
 Changed
 Deprecated
 Removed
 Fixed
 Security
+
+## v0.3.1 - 2017-08-07
+
+Added
+* Support for [`.editorconfig`](http://editorconfig.org) (Props @salcode)
+* More thorough unit testing
+
+Fixed
+* Bug where `activate: false` still caused plugins to be activated (#20 - props @codepuncher)
 
 ## v0.3.0 - 2017-05-26
 
