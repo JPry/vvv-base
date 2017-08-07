@@ -308,7 +308,7 @@ PHP;
                 'dbpass'    => 'wp',
                 'dbhost'    => 'localhost',
                 'dbprefix'  => $this->site['prefix'],
-                'locale'    => 'en_US',
+                'locale'    => $this->site['locale'],
                 'extra-php' => $extra_php,
             )
         )->mustRun()->getOutput();
