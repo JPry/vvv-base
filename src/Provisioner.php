@@ -7,8 +7,8 @@ namespace JPry\VVVBase;
 
 use JPry\DefaultsArray;
 use Monolog\Logger;
-use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 class Provisioner
 {
@@ -382,6 +382,11 @@ PHP;
     {
         $this->builder->setArguments($positional);
         foreach ($flags as $flag => $value) {
+            // False can be used to explicitly bypass a value
+            if (false === $value) {
+                continue;
+            }
+
             // Build flag, including value if truthy
             $cmd = "--{$flag}" . ($value ? "={$value}" : '');
             $this->builder->add($cmd);
