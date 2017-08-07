@@ -137,7 +137,7 @@ class Provisioner
                 'admin_password'         => 'password',
                 'admin_email'            => 'admin@localhost.local',
                 'title'                  => 'My Awesome VVV Site',
-                'prefix'                 => 'wp_',
+                'db_prefix'              => 'wp_',
                 'multisite'              => false,
                 'xipio'                  => true,
                 'version'                => 'latest',
@@ -155,8 +155,15 @@ class Provisioner
             )
         );
 
+        // Handle old or alternate option names
         if (isset($this->site['wp-content'])) {
             $this->site->setDefault('wp_content', $this->site['wp-content']);
+        }
+        if (isset($this->site['prefix'])) {
+            $this->site->setDefault('db_prefix', $this->site['prefix']);
+        }
+        if (isset($this->site['dbprefix'])) {
+            $this->site->setDefault('db_prefix', $this->site['dbprefix']);
         }
 
         $this->base_dir   = "{$this->vm_dir}/htdocs";
@@ -307,7 +314,7 @@ PHP;
                 'dbuser'    => 'wp',
                 'dbpass'    => 'wp',
                 'dbhost'    => 'localhost',
-                'dbprefix'  => $this->site['prefix'],
+                'dbprefix'  => $this->site['db_prefix'],
                 'locale'    => $this->site['locale'],
                 'extra-php' => $extra_php,
             )

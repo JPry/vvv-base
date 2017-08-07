@@ -90,6 +90,11 @@ This is the title to use for the site. Default is `My Awesome VVV site`.
 
 The database prefix to use. Defaults to `wp_`.
 
+Alternate forms of this option include:
+
+* `prefix`
+* `dbprefix`
+
 ### `multisite`
 
 Whether to create a multisite installation. There are three valid values:
