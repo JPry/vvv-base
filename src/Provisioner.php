@@ -42,7 +42,7 @@ class Provisioner
     /**
      * Provisioner constructor.
      *
-     * @param ProcessBuilder $builder     ProcessBuider for generating commands.
+     * @param ProcessBuilder $builder     ProcessBuilder for generating commands.
      * @param \mysqli        $db          Database connection.
      * @param string         $vm_dir      Root directory for the site.
      * @param string         $site_name   The name of the site.
