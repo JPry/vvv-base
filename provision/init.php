@@ -5,6 +5,9 @@
 
 namespace JPry\VVVBase;
 
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -37,6 +40,11 @@ try {
     exit($e->getCode());
 }
 
+// Set up logger.
+$stream = new StreamHandler('php://stdout', Logger::INFO);
+$stream->setFormatter(new LineFormatter("%channel%.%level_name%: %message%\n"));
+$logger = new Logger('provisioner', array($stream));
+
 // Set up and run our provisioner.
 echo "Connecting to DB...\n";
 $db = new \mysqli('localhost', 'root', 'root');
@@ -50,7 +58,8 @@ $provisioner = new Provisioner(
     $db,
     $options['vm_dir'],
     $options['site_escaped'],
-    $config['sites'][$options['site_escaped']]
+    $config['sites'][$options['site_escaped']],
+    $logger
 );
 $provisioner->provision();
 

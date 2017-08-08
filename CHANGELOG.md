@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## next_release - date
+
+Added
+Changed
+Deprecated
+Removed
+Fixed
+Security
+
+## v0.3.1 - 2017-08-07
+
+Added
+* Support for [`.editorconfig`](http://editorconfig.org) (Props @salcode)
+* More thorough unit testing
+* Alternate versions of the `db_prefix` option: `prefix`, `dbprefix`.
+
+Fixed
+* Bug where `activate: false` still caused plugins to be activated ([#20](https://github.com/JPry/vvv-base/issues/20) - props @codepuncher)
+* Documentation for `db_prefix` option did not match actual behavior. The behavior itself was fixed.
+
 ## v0.3.0 - 2017-05-26
 
 Added

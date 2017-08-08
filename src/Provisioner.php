@@ -6,36 +6,63 @@
 namespace JPry\VVVBase;
 
 use JPry\DefaultsArray;
-use Symfony\Component\Process\ProcessBuilder;
+use Monolog\Logger;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 class Provisioner
 {
-    protected $builder;
-    protected $db;
-    protected $config;
-    protected $site_name;
-    protected $site;
-    protected $vm_dir;
+    /** @var  string */
     protected $base_dir;
+
+    /** @var ProcessBuilder */
+    protected $builder;
+
+    /** @var array */
+    protected $config;
+
+    /** @var \mysqli */
+    protected $db;
+
+    /** @var Logger */
+    protected $logger;
+
+    /** @var  DefaultsArray */
+    protected $site;
+
+    /** @var string */
+    protected $site_name;
+
+    /** @var string */
+    protected $vm_dir;
+
+    /** @var  string */
     protected $wp_content;
 
     /**
      * Provisioner constructor.
      *
-     * @param ProcessBuilder $builder     ProcessBuider for generating commands.
+     * @param ProcessBuilder $builder     ProcessBuilder for generating commands.
      * @param \mysqli        $db          Database connection.
      * @param string         $vm_dir      Root directory for the site.
      * @param string         $site_name   The name of the site.
      * @param array          $site_config The config for the site.
+     * @param Logger         $logger      A logger instance.
      */
-    public function __construct(ProcessBuilder $builder, \mysqli $db, $vm_dir, $site_name, array $site_config)
-    {
+    public function __construct(
+        ProcessBuilder $builder,
+        \mysqli $db,
+        $vm_dir,
+        $site_name,
+        array $site_config,
+        Logger $logger
+    ) {
         $this->builder   = $builder;
         $this->db        = $db;
         $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
-        $this->config    = (array)$site_config;
+        $this->config    = (array) $site_config;
+        $this->logger    = $logger;
 
         // Ensure that there is a custom array in the site config.
         if (!array_key_exists('custom', $this->config)) {
@@ -56,7 +83,7 @@ class Provisioner
         $this->createNginxConfig();
 
         if (!$this->site['wp']) {
-            echo "Skipping WordPress setup.\n\n";
+            $this->logger->info("Skipping WordPress setup.\n");
 
             return;
         }
@@ -96,7 +123,7 @@ class Provisioner
     protected function setupSite()
     {
         if (isset($this->config['hosts'])) {
-            $hosts     = (array)$this->config['hosts'];
+            $hosts     = (array) $this->config['hosts'];
             $main_host = $hosts[0];
         } else {
             $main_host = "{$this->site_name}.local";
@@ -110,7 +137,7 @@ class Provisioner
                 'admin_password'         => 'password',
                 'admin_email'            => 'admin@localhost.local',
                 'title'                  => 'My Awesome VVV Site',
-                'prefix'                 => 'wp_',
+                'db_prefix'              => 'wp_',
                 'multisite'              => false,
                 'xipio'                  => true,
                 'version'                => 'latest',
@@ -128,8 +155,15 @@ class Provisioner
             )
         );
 
+        // Handle old or alternate option names
         if (isset($this->site['wp-content'])) {
             $this->site->setDefault('wp_content', $this->site['wp-content']);
+        }
+        if (isset($this->site['prefix'])) {
+            $this->site->setDefault('db_prefix', $this->site['prefix']);
+        }
+        if (isset($this->site['dbprefix'])) {
+            $this->site->setDefault('db_prefix', $this->site['dbprefix']);
         }
 
         $this->base_dir   = "{$this->vm_dir}/htdocs";
@@ -149,7 +183,7 @@ class Provisioner
         // If we already have the htdocs dir, remove it.
         $this->removeDefaultHtdocs();
 
-        echo "Cloning [{$this->site['htdocs']}] into {$this->base_dir}...\n";
+        $this->logger->info("Cloning [{$this->site['htdocs']}] into {$this->base_dir}...");
         echo $this->getCmd(
             array('git', 'clone', $this->site['htdocs'], $this->base_dir),
             array(
@@ -171,7 +205,7 @@ class Provisioner
         // Maybe remove the default wp-content directory.
         $this->removeDefaultWpContent();
 
-        echo "Cloning [{$this->site['wp_content']}] into wp-content...\n";
+        $this->logger->info("Cloning [{$this->site['wp_content']}] into wp-content...");
         echo $this->getCmd(
             array('git', 'clone', $this->site['wp_content'], $this->wp_content),
             array(
@@ -197,14 +231,14 @@ class Provisioner
      */
     protected function createDB()
     {
-        echo "Checking database for site...\n";
+        $this->logger->info('Checking database for site...');
         $result = $this->db->query("SHOW DATABASES LIKE '{$this->site_name}'");
         if (empty($result) || 0 === $result->num_rows) {
-            echo "Creating DB for {$this->site_name}\n";
+            $this->logger->info("Creating DB for {$this->site_name}");
             $this->db->query("CREATE DATABASE `{$this->site_name}`;");
-            echo "Granting privileges on DB...\n";
+            $this->logger->info("Granting privileges on DB...");
             $this->db->query("GRANT ALL PRIVILEGES ON `{$this->site_name}`.* TO wp@localhost IDENTIFIED BY 'wp'");
-            echo "DB setup complete.\n";
+            $this->logger->info("DB setup complete.");
         }
     }
 
@@ -214,7 +248,7 @@ class Provisioner
     protected function createLogs()
     {
         if (!file_exists("{$this->vm_dir}/log")) {
-            echo "Creating {$this->vm_dir}/log directory...\n";
+            $this->logger->info("Creating {$this->vm_dir}/log directory...");
             mkdir("{$this->vm_dir}/log", 0775);
         }
 
@@ -231,7 +265,7 @@ class Provisioner
      */
     protected function createNginxConfig()
     {
-        echo "Setting up Nginx config\n";
+        $this->logger->info('Setting up Nginx config');
         $provision_dir = dirname(__DIR__) . '/provision';
         $config        = "{$provision_dir}/vvv-nginx.conf";
         $template      = "{$provision_dir}/vvv-nginx.template";
@@ -280,8 +314,8 @@ PHP;
                 'dbuser'    => 'wp',
                 'dbpass'    => 'wp',
                 'dbhost'    => 'localhost',
-                'dbprefix'  => $this->site['prefix'],
-                'locale'    => 'en_US',
+                'dbprefix'  => $this->site['db_prefix'],
+                'locale'    => $this->site['locale'],
                 'extra-php' => $extra_php,
             )
         )->mustRun()->getOutput();
@@ -293,7 +327,7 @@ PHP;
     protected function deleteDefaultContent()
     {
         if ($this->site['delete_default_plugins']) {
-            echo "Removing default plugins...\n";
+            $this->logger->info('Removing default plugins...');
             $default_plugins = array(
                 'akismet',
                 'hello',
@@ -306,7 +340,7 @@ PHP;
         }
 
         if ($this->site['delete_default_themes']) {
-            echo "Removing default themes...\n";
+            $this->logger->info('Removing default themes...');
             $default_themes = array(
                 'twelve',
                 'thirteen',
@@ -355,6 +389,11 @@ PHP;
     {
         $this->builder->setArguments($positional);
         foreach ($flags as $flag => $value) {
+            // False can be used to explicitly bypass a value
+            if (false === $value) {
+                continue;
+            }
+
             // Build flag, including value if truthy
             $cmd = "--{$flag}" . ($value ? "={$value}" : '');
             $this->builder->add($cmd);
@@ -386,7 +425,7 @@ PHP;
      */
     protected function hasHtdocs()
     {
-        return (bool)$this->site['htdocs'];
+        return (bool) $this->site['htdocs'];
     }
 
     /**
@@ -396,7 +435,7 @@ PHP;
      */
     protected function hasWpContent()
     {
-        return (bool)$this->site['wp_content'];
+        return (bool) $this->site['wp_content'];
     }
 
     /**
@@ -420,7 +459,7 @@ PHP;
         // Change the prefix for the command builder.
         $this->builder->setPrefix(array('wp', $type, 'install'));
 
-        echo "Installing {$type}s...\n";
+        $this->logger->info("Installing {$type}s...");
         foreach ($items as $item) {
             // If the item is just a string, we can install it with no other options.
             if (is_string($item)) {
@@ -494,7 +533,7 @@ PHP;
     {
         $is_installed = $this->getCmd(array('wp', 'core', 'is-installed'))->run();
         if (0 !== $is_installed) {
-            echo "Installing WordPress...\n";
+            $this->logger->info('Installing WordPress...');
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
             $install_flags   = array(
                 'url'            => $this->site['main_host'],
@@ -521,7 +560,7 @@ PHP;
     protected function removeDefaultHtdocs()
     {
         if (file_exists($this->base_dir)) {
-            echo "Removing default htdocs directory...\n";
+            $this->logger->info('Removing default htdocs directory...');
             echo $this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput();
         }
     }
@@ -532,7 +571,7 @@ PHP;
     protected function removeDefaultWpContent()
     {
         if (file_exists($this->wp_content)) {
-            echo "Removing default wp-content directory...\n";
+            $this->logger->info('Removing default wp-content directory...');
             echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
         }
     }

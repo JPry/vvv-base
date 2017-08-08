@@ -1,8 +1,12 @@
 # vvv-base
 
+![circle ci status badge](https://circleci.com/gh/JPry/vvv-base/tree/develop.svg?style=shield&circle-token=2a4b06e9259652a98d26b701ab76636f38d95cc8)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/JPry/vvv-base.svg)](http://isitmaintained.com/project/JPry/vvv-base "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/JPry/vvv-base.svg)](http://isitmaintained.com/project/JPry/vvv-base "Percentage of issues still open")
+
 Base repository for new VVV2 sites
 
-**Warning:** This is still a work-in-progress. Use at your own risk. Please report any issues you may find.
+Please [report any issues](https://github.com/JPry/vvv-base/issues) you may find.
 
 ## Overview
 
@@ -85,6 +89,11 @@ This is the title to use for the site. Default is `My Awesome VVV site`.
 ### `db_prefix`
 
 The database prefix to use. Defaults to `wp_`.
+
+Alternate forms of this option include:
+
+* `prefix`
+* `dbprefix`
 
 ### `multisite`
 
@@ -181,3 +190,7 @@ Using this option prevent the following options from having any effect:
 Whether to do any WordPress setup whatsoever. Defaults (naturally) to `true`.
 
 If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress.
+
+## Contributing
+
+Contributions are welcome! Please see our [Contribution guidelines](https://github.com/JPry/vvv-base/blob/develop/.github/CONTRIBUTING.md).

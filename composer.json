@@ -19,13 +19,23 @@
     "require": {
         "symfony/yaml": "^3.2",
         "symfony/process": "^3.2",
-        "jpry/array-defaults": "^1.0"
+        "jpry/array-defaults": "^1.0",
+        "monolog/monolog": "^1.22"
     },
     "config": {
         "vendor-dir": "provision/vendor"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.1",
-        "mikey179/vfsStream": "^1"
+        "mikey179/vfsStream": "^1",
+        "wp-cli/wp-cli": "^1.1"
+    },
+    "repositories": [
+
+    ],
+    "extra": {
+        "autoload-splitter": {
+            "splitter-location": "provision/vendor/wp-cli/wp-cli/php/WP_CLI/AutoloadSplitter.php"
+        }
     }
 }
