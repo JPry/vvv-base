@@ -61,13 +61,8 @@ class Provisioner
         $this->db        = $db;
         $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
-        $this->config    = (array) $site_config;
+        $this->config    = $site_config;
         $this->logger    = $logger;
-
-        // Ensure that there is a custom array in the site config.
-        if (!array_key_exists('custom', $this->config)) {
-            $this->config['custom'] = array();
-        }
 
         $this->setupSite();
     }
@@ -122,7 +117,7 @@ class Provisioner
      */
     protected function setupSite()
     {
-        if (isset($this->config['hosts'])) {
+        if (!empty($this->config['hosts'])) {
             $hosts     = (array) $this->config['hosts'];
             $main_host = $hosts[0];
         } else {
@@ -133,25 +128,8 @@ class Provisioner
         $this->site = new DefaultsArray($this->config['custom']);
         $this->site->setDefaults(
             array(
-                'admin_user'             => 'admin',
-                'admin_password'         => 'password',
-                'admin_email'            => 'admin@localhost.local',
-                'title'                  => 'My Awesome VVV Site',
-                'db_prefix'              => 'wp_',
-                'multisite'              => false,
-                'xipio'                  => true,
-                'version'                => 'latest',
-                'locale'                 => 'en_US',
-                'main_host'              => $main_host,
-                'hosts'                  => $hosts,
-                'plugins'                => array(),
-                'themes'                 => array(),
-                'delete_default_plugins' => false,
-                'delete_default_themes'  => false,
-                'wp_content'             => false,
-                'wp'                     => true,
-                'download_wp'            => true,
-                'htdocs'                 => false,
+                'main_host' => $main_host,
+                'hosts'     => $hosts,
             )
         );
 
