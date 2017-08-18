@@ -320,7 +320,7 @@ PHP;
             foreach ($default_plugins as $plugin) {
                 $cmd = $this->getCmd(array('wp', 'plugin', 'delete', $plugin));
                 $cmd->run();
-                echo $cmd->getOutput();
+                $this->logger->info($cmd->getOutput());
             }
         }
 
@@ -337,7 +337,7 @@ PHP;
             foreach ($default_themes as $theme) {
                 $cmd = $this->getCmd(array('wp', 'theme', 'delete', "twenty{$theme}"));
                 $cmd->run();
-                echo $cmd->getOutput();
+                $this->logger->info($cmd->getOutput());
             }
         }
     }
@@ -468,7 +468,7 @@ PHP;
 
             // Now run the command.
             $cmd->run();
-            echo $cmd->getOutput();
+            $this->logger->info($cmd->getOutput());
         }
 
         // Restore the normal prefix.
@@ -525,7 +525,9 @@ PHP;
                 $install_flags['subdomains'] = null;
             }
 
-            echo $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput();
+            $this->logger->info(
+                $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput()
+            );
         }
     }
 
@@ -536,7 +538,7 @@ PHP;
     {
         if (file_exists($this->base_dir)) {
             $this->logger->info('Removing default htdocs directory...');
-            echo $this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput();
+            $this->logger->info($this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput());
         }
     }
 
@@ -547,7 +549,7 @@ PHP;
     {
         if (file_exists($this->wp_content)) {
             $this->logger->info('Removing default wp-content directory...');
-            echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
+            $this->logger->info($this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput());
         }
     }
 }
