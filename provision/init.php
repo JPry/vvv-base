@@ -21,6 +21,11 @@ require_once(__DIR__ . '/functions.php');
 // Grab CLI options
 $options = get_cli_options();
 
+// Set up logger.
+$stream = new StreamHandler('php://stdout', Logger::INFO);
+$stream->setFormatter(new LineFormatter("%channel%.%level_name%: %message%\n"));
+$logger = new Logger('provisioner', array($stream));
+
 try {
     // Ensure we have all of the necessary options.
     validate_flags($options);
@@ -40,10 +45,6 @@ try {
     exit($e->getCode());
 }
 
-// Set up logger.
-$stream = new StreamHandler('php://stdout', Logger::INFO);
-$stream->setFormatter(new LineFormatter("%channel%.%level_name%: %message%\n"));
-$logger = new Logger('provisioner', array($stream));
 
 // Set up and run our provisioner.
 echo "Connecting to DB...\n";
