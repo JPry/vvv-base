@@ -273,6 +273,7 @@ class Provisioner
     protected function createWpConfig()
     {
         if (file_exists("{$this->base_dir}/wp-config.php")) {
+            $this->logger->info('wp-config.php file found');
             return;
         }
 
