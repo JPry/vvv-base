@@ -27,6 +27,9 @@ class Provisioner
     /** @var Logger */
     protected $logger;
 
+    /** @var  array */
+    protected $overrides;
+
     /** @var  DefaultsArray */
     protected $site;
 
@@ -48,6 +51,7 @@ class Provisioner
      * @param string         $site_name   The name of the site.
      * @param array          $site_config The config for the site.
      * @param Logger         $logger      A logger instance.
+     * @param array          $overrides   vvvBase override settings.
      */
     public function __construct(
         ProcessBuilder $builder,
@@ -55,7 +59,8 @@ class Provisioner
         $vm_dir,
         $site_name,
         array $site_config,
-        Logger $logger
+        Logger $logger,
+        array $overrides
     ) {
         $this->builder   = $builder;
         $this->db        = $db;
@@ -63,6 +68,7 @@ class Provisioner
         $this->site_name = $site_name;
         $this->config    = $site_config;
         $this->logger    = $logger;
+        $this->overrides = $overrides;
 
         $this->setupSite();
     }
@@ -484,7 +490,7 @@ PHP;
      */
     protected function installPlugins()
     {
-        $plugins = $this->site['plugins'];
+        $plugins = array_merge($this->overrides['plugins'], $this->site['plugins']);
         if (empty($plugins)) {
             return;
         }
@@ -497,7 +503,7 @@ PHP;
      */
     protected function installThemes()
     {
-        $themes = $this->site['themes'];
+        $themes = array_merge($this->overrides['themes'], $this->site['themes']);
         if (empty($themes)) {
             return;
         }

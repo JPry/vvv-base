@@ -57,7 +57,8 @@ try {
         $options['vm_dir'],
         $options['site_escaped'],
         $site,
-        $logger
+        $logger,
+        $vvvBase
     );
     $provisioner->provision();
 
