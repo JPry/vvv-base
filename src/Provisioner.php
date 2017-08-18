@@ -446,35 +446,25 @@ PHP;
 
         $this->logger->info("Installing {$type}s...");
         foreach ($items as $item) {
-            // If the item is just a string, we can install it with no other options.
-            if (is_string($item)) {
-                $cmd = $this->getCmd(array($item));
-            } elseif (is_array($item)) {
-                if (!isset($item[$type])) {
-                    continue;
-                }
 
-                // Grab the item name.
-                $name = $item[$type];
+            // Grab the item name.
+            $name = $item[$type];
 
-                // Determine the item flags.
-                $valid_flags = array(
-                    'version'  => true,
-                    'force'    => true,
-                    'activate' => true,
-                );
+            // Determine the item flags.
+            $valid_flags = array(
+                'version'  => true,
+                'force'    => true,
+                'activate' => true,
+            );
 
-                if ('plugin' === $type) {
-                    $valid_flags['activate-network'] = true;
-                }
-
-                $item_flags = array_intersect_key($item, $valid_flags);
-
-                // Generate the command.
-                $cmd = $this->getCmd(array($name), $item_flags);
-            } else {
-                continue;
+            if ('plugin' === $type) {
+                $valid_flags['activate-network'] = true;
             }
+
+            $item_flags = array_intersect_key($item, $valid_flags);
+
+            // Generate the command.
+            $cmd = $this->getCmd(array($name), $item_flags);
 
             // Now run the command.
             $cmd->run();
