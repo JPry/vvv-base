@@ -69,127 +69,26 @@ Vagrant will generate the files in the filesystem for you, and configure the sit
 ## Options
 
 None of the options for the `custom` array are required. If any option is not provided, then the default will be used.
+Options with ~strikethrough~ have been deprecated, or their use is otherwise discouraged.
 
-### `admin_user`
-
-This is the username to use for the primary admin user. Default is `admin`.
-
-### `admin_password`
-
-This is the password to use for the primary admin user. Default is `password`.
-
-### `admin_email`
-
-This is the email address to use for the primary admin user. Default is `admin@localhost.local`
-
-### `title`
-
-This is the title to use for the site. Default is `My Awesome VVV site`.
-
-### `db_prefix`
-
-The database prefix to use. Defaults to `wp_`.
-
-Alternate forms of this option include:
-
-* `prefix`
-* `dbprefix`
-
-### `multisite`
-
-Whether to create a multisite installation. There are three valid values:
-
-* `false` - This is the default option. A non-multisite WordPress site will be created.
-* `true` - Create a **subdirectory** multisite.
-* `subdomain` or `subdomains` - Create a **subdomain** multisite.
-
-**Note:** Any truthy value will create a subdirectory multisite.
-
-### `xipio`
-
-Whether to enable support for [xip.io](http://xip.io). This will set up the Nginx config to include the Xip.io version of the first domain. Defaults to `true`.
-
-### `version`
-
-The WordPress version to install. Defaults to `latest`.
-
-### `locale`
-
-The locale to use when installing WordPress. Defaults to `en_US`.
-
-### `plugins`
-
-A list of plugins to install using WP CLI. There are two ways to specify what plugins to install:
-
-1. Use the plugin slug, zip, or url. This value can be anything [accepted by WP CLI](https://developer.wordpress.org/cli/commands/plugin/install/)
-1. Specify an array of options for a plugin. These options are specific to WP CLI. Available options are:
- * `plugin` - The plugin slug, the path to a local zip file, or URL to a remote zip file.
- * `version` - The particular version of the plugin to install. *(Note: This may only work for plugins from the wordpress.org repository)*
- * `force` - Overwrite an existing installed version of the plugin.
- * `activate` - Activate the plugin after installation.
- * `activate-network` - *(Multisite only)* Network activate the plugin after installation.
-
-Defaults to an empty array.
-
-### `themes`
-
-A list of themes to install using WP CLI. There are two ways to specify what themes to install:
-
-1. Use the theme slug, zip, or url. This value can be anything [accepted by WP CLI](https://developer.wordpress.org/cli/commands/theme/install/)
-1. Specify an array of options for a theme. These options are specific to WP CLI. Available options are:
- * `theme` - The theme slug, the path to a local zip file, or URL to a remote zip file.
- * `version` - The particular version of the theme to install. *(Note: This may only work for themes from the wordpress.org repository)*
- * `force` - Overwrite an existing installed version of the theme.
- * `activate` - Activate the theme after installation.
-
-Defaults to an empty array.
-
-### `delete_default_plugins`
-
-Delete the default plugins. Defaults to `false`. Currently "Akismet" and "Hello Dolly" are removed. 
-
-### `delete_default_themes`
-
-Delete the default themes. Defaults to `false`. Currently the following themes are removed with this set:
-
-* `twentytwelve`
-* `twentythirteen`
-* `twentyfourteen`
-* `twentyfifteen`
-* `twentysixteen`
-* `twentyseventeen`
-
-### `wp-content`
-
-Deprecated. Use `wp_content`.
-
-### `wp_content`
-
-Set a git repo to clone as the `htdocs/wp-content` directory. Defaults to `false`.
-
-Using this option prevent the following options from having any effect:
-* `plugins`
-* `themes`
-* `delete_default_plugins`
-* `delete_default_themes`
-
-### `htdocs`
-
-Similar to the `wp_content` setting, use this option to set a Git repo to clone as the root `htdocs/` directory. Defaults to `false`.
-
-Using this option prevent the following options from having any effect:
-* `wp_content`
-* `plugins`
-* `themes`
-* `delete_default_plugins`
-* `delete_default_themes`
-* `wp`
-
-### `wp`
-
-Whether to do any WordPress setup whatsoever. Defaults (naturally) to `true`.
-
-If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress.
+Option | Notes | Default 
+:----: | ----- | ------- 
+`admin_user` | This is the username to use for the primary admin user. | `admin` 
+`admin_password` | This is the password to use for the primary admin user. | `password` 
+`admin_email` | This is the email address to use for the primary admin user. | `admin@localhost.local`
+`title` | This is the title to use for the site. | `My Awesome VVV site`
+`db_prefix`<br>~`prefix`<br>`dbprefix`~ | <span>The database prefix to use. | `wp_`
+`multisite` | Whether to create a multisite installation. There are three valid values:<ul><li>`false` - A non-multisite WordPress site will be created.</li><li>`true` - Create a **subdirectory** multisite.</li><li>`subdomain` or `subdomains` - Create a **subdomain** multisite.</li></ul><br>**Note:** Any truthy value will create a subdirectory multisite. | `false` 
+`xipio` | Whether to enable support for [xip.io](http://xip.io). This will set up the Nginx config to include the Xip.io version of the first domain. | `true` 
+`version` | The WordPress version to install. | `latest` 
+`locale` | The locale to use when installing WordPress. | `en_US` 
+`plugins` | A list of plugins to install using WP CLI. There are two ways to specify what plugins to install:<ol><li>Use the plugin slug, zip, or url. This value can be anything [accepted by WP CLI](https://developer.wordpress.org/cli/commands/plugin/install/)</li><li>Specify an array of options for a plugin. These options are specific to WP CLI. Available options are:<ul><li>`plugin` - The plugin slug, the path to a local zip file, or URL to a remote zip file.</li><li>`version` - The particular version of the plugin to install. *(Note: This may only work for plugins from the wordpress.org repository)*</li><li>`force` - Overwrite an existing installed version of the plugin.</li><li>`activate` - Activate the plugin after installation.</li><li>`activate-network` - *(Multisite only)* Network activate the plugin after installation.</li></ul></li></ol>| Empty array 
+`themes` | A list of themes to install using WP CLI. There are two ways to specify what themes to install:<ol><li>Use the theme slug, zip, or url. This value can be anything [accepted by WP CLI](https://developer.wordpress.org/cli/commands/theme/install/)</li><li>Specify an array of options for a theme. These options are specific to WP CLI. Available options are:<ul><li>`theme` - The theme slug, the path to a local zip file, or URL to a remote zip file.</li><li>`version` - The particular version of the theme to install. *(Note: This may only work for themes from the wordpress.org repository)*</li><li>`force` - Overwrite an existing installed version of the theme.</li><li>`activate` - Activate the theme after installation.</li></ul></li></ol> | Empty array
+`delete_default_plugins` | Delete the default plugins. Currently "Akismet" and "Hello Dolly" are removed. | `false`
+`delete_default_themes` | Delete the default themes. Currently the following themes are removed with this set:<ul><li>`twentytwelve`</li><li>`twentythirteen`</li><li>`twentyfourteen`</li><li>`twentyfifteen`</li><li>`twentysixteen`</li><li>`twentyseventeen`</li></ul> | `false`
+`wp_content`<br>~`wp-content`~ | Set a git repo to clone as the `htdocs/wp-content` directory. Using this option prevent the following options from having any effect:<ul><li>`plugins`</li><li>`themes`</li><li>`delete_default_plugins`</li><li>`delete_default_themes`</li></ul> | `false`
+`htdocs` | Similar to the `wp_content` setting, use this option to set a Git repo to clone as the root `htdocs/` directory. Using this option prevent the following options from having any effect:<ul><li>`wp_content`</li><li>`plugins`</li><li>`themes`</li><li>`delete_default_plugins`</li><li>`delete_default_themes`</li><li>`wp`</li></ul> | `false`
+`wp` | Whether to do any WordPress setup whatsoever.<br><br>If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress. | `true` (naturally)
 
 ## Contributing
 
