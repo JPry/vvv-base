@@ -90,6 +90,40 @@ Option | Notes | Default
 `htdocs` | Similar to the `wp_content` setting, use this option to set a Git repo to clone as the root `htdocs/` directory. Using this option prevent the following options from having any effect:<ul><li>`wp_content`</li><li>`plugins`</li><li>`themes`</li><li>`delete_default_plugins`</li><li>`delete_default_themes`</li><li>`wp`</li></ul> | `false`
 `wp` | Whether to do any WordPress setup whatsoever.<br><br>If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress. | `true` (naturally)
 
+## Global Settings
+
+In addition to the site-specific settings listed above, there are some global settings that can be used to affect
+all of the sites in your config. These options are all keyed under a single global key, `vvvbase`. Here's an example
+of what your `vvv-custom.yml` might look like with this key in place:
+
+```yml
+sites:
+    mysite:
+        repo: https://github.com/JPry/vvv-base.git
+
+    # Other sites defined here
+
+vvvbase:
+    db:
+        host: localhost
+        user: root
+        pass: root
+
+    plugins:
+        - jetpack
+
+    themes
+        - hestia
+```
+
+Here are all of the Global Settings and how they work:
+
+Setting | Notes
+:-----: | -----
+`db` | Settings for the database. Using these settings allow you to define a custom database connection for your sites. Keys include:<ul><li>`host` - The database host name</li><li>`user` - The database username</li><li>`pass` - The database password</li></ul>
+`plugins` | This is a list of plugins that should be installed for **all** of your sites. This works exactly the same way as the `plugins` setting for an individual site. Refer to the options table above for exact usage details.
+`themes` | This is a list of themes that should be installed for **all** of your sites. This works exactly the same way as the `themes` setting for an individual site. Refer to the options table above for exact usage details.
+
 ## Contributing
 
 Contributions are welcome! Please see our [Contribution guidelines](https://github.com/JPry/vvv-base/blob/develop/.github/CONTRIBUTING.md).
