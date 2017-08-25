@@ -112,7 +112,7 @@ vvvbase:
     plugins:
         - jetpack
 
-    themes
+    themes:
         - hestia
 ```
 
