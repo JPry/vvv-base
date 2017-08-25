@@ -19,15 +19,15 @@ This project is intended to be a generic base repo for use with VVV2. All custom
 
 ```yml
 sites:
-    example-site:
+    mysite:
         repo: https://github.com/JPry/vvv-base.git
         hosts:
-            - example.local
-            - subdomain.example.local
+            - mysite.local
+            - subdomain.mysite.local
         custom:
-            admin_user: example
-            admin_password: example_password
-            admin_email: example@localhost.local
+            admin_user: mysite
+            admin_password: mysite_password
+            admin_email: mysite@localhost.local
             title: An Awesome Example Site
             db_prefix: ex_
             multisite: false
@@ -54,14 +54,14 @@ To use this repository with VVV2, [create a new site in `vvv-custom.yml`](https:
 
 ```yml
 sites:
-    example-site:
+    mysite:
         repo: https://github.com/JPry/vvv-base.git
 ```
 
 Once that has been added to your `vvv-custom.yml` file, simply run a provision. It's easiest to provision only the site you just created using this command:
 
 ```bash
-vagrant provision --provision-with site-example-site
+vagrant provision --provision-with site-mysite
 ```
 
 Vagrant will generate the files in the filesystem for you, and configure the site based on the options below.
