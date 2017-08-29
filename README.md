@@ -89,6 +89,7 @@ Option | Notes | Default
 `wp_content`<br>~`wp-content`~ | Set a git repo to clone as the `htdocs/wp-content` directory. Using this option prevent the following options from having any effect:<ul><li>`plugins`</li><li>`themes`</li><li>`delete_default_plugins`</li><li>`delete_default_themes`</li></ul> | `false`
 `htdocs` | Similar to the `wp_content` setting, use this option to set a Git repo to clone as the root `htdocs/` directory. Using this option prevent the following options from having any effect:<ul><li>`wp_content`</li><li>`plugins`</li><li>`themes`</li><li>`delete_default_plugins`</li><li>`delete_default_themes`</li><li>`wp`</li></ul> | `false`
 `wp` | Whether to do any WordPress setup whatsoever.<br><br>If you're going to be building a non-WordPress local site, or if you have a very custom WordPress setup to install, this will skip the automation around downloading, configuring, and installing WordPress. | `true` (naturally)
+`skip_plugins` | A list of plugins to **skip** installing. The plugins in this list are ones that you have defined in the [Global Settings](#global-settings) that you do not want for a particular site.<br><br>**Note:** Unlike the `plugins` setting, this setting is a list of **only the plugin slug**. As an example, if you have Jetpack in your global plugin list as `- { plugin: jetpack, activate: true }`, in this list you only need `- jetpack`. | Empty array.
 
 ## Global Settings
 

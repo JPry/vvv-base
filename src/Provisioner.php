@@ -428,10 +428,11 @@ PHP;
      *
      * @param string $type  The type of item to install.
      * @param array  $items Array of items to install.
+     * @param array  $skip  Array of items to skip installing.
      *
      * @throws \Exception When an invalid type is provided.
      */
-    protected function installHelper($type, $items)
+    protected function installHelper($type, $items, $skip = array())
     {
         $types = array(
             'plugin' => true,
@@ -441,6 +442,8 @@ PHP;
             throw new \Exception("Invalid installer type: {$type}");
         }
 
+        $flipped = !empty($skip) ? array_flip($skip) : array();
+
         // Change the prefix for the command builder.
         $this->builder->setPrefix(array('wp', $type, 'install'));
 
@@ -449,6 +452,12 @@ PHP;
 
             // Grab the item name.
             $name = $item[$type];
+
+            // Maybe skip the item.
+            if (isset($flipped[$name])) {
+                $this->logger->info("Found {$name} in skip list, skipping...");
+                continue;
+            }
 
             // Determine the item flags.
             $valid_flags = array(
@@ -485,7 +494,8 @@ PHP;
             return;
         }
 
-        $this->installHelper('plugin', $plugins);
+        $skip = $this->site['skip_plugins'];
+        $this->installHelper('plugin', $plugins, $skip);
     }
 
     /**

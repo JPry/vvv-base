@@ -85,6 +85,11 @@ class Site implements ConfigurationInterface
                         ->booleanNode('wp')->defaultTrue()->end()
                         ->booleanNode('download_wp')->defaultTrue()->end()
                         ->scalarNode('htdocs')->end()
+                        ->arrayNode('skip_plugins')
+                            ->defaultValue(array())
+                            ->prototype('scalar')
+                            ->end()
+                        ->end()
 
                         // These are old config values that aren't used anymore.
                         ->scalarNode('wp-content')
