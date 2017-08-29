@@ -23,7 +23,7 @@ $options = get_cli_options();
 
 // Set up logger.
 $stream = new StreamHandler('php://stdout', Logger::INFO);
-$stream->setFormatter(new LineFormatter("%channel%.%level_name%: %message%\n"));
+$stream->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n"));
 $logger = new Logger('provisioner', array($stream));
 
 try {
