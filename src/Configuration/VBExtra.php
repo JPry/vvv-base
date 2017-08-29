@@ -21,6 +21,7 @@ class VBExtra implements ConfigurationInterface
             ->ignoreExtraKeys()
             ->children()
                 ->arrayNode('vvvbase')
+                ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('db')
                         ->addDefaultsIfNotSet()
