@@ -5,7 +5,6 @@
 
 namespace JPry\VVVBase\Configuration;
 
-
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
