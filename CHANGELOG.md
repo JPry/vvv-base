@@ -13,6 +13,19 @@ Removed
 Fixed
 Security
 
+## v0.4.0 - 2017-10-17
+
+Added
+* Global overrides for the `db`, `plugins`, and `themes` settings. See [the Readme](https://github.com/JPry/vvv-base/blob/master/README.md#global-settings).
+* Use the [Symfony Config Component](https://symfony.com/doc/current/components/config.html) for managing available options.
+
+Changed
+* Improved the clarity of the example domain (props @salcode)
+* Reformatted readme.md file
+* Use [Logger Interface](http://www.php-fig.org/psr/psr-3/) with [Monolog](https://seldaek.github.io/monolog/) instead of `echo`ing script output
+* Standardized error situations to use thrown and caught Exceptions
+* Updated unit test mocking to use [Prophecies](https://phpunit.de/manual/current/en/test-doubles.html#test-doubles.prophecy)
+
 ## v0.3.1 - 2017-08-07
 
 Added
