@@ -17,10 +17,11 @@
         }
     },
     "require": {
-        "symfony/yaml": "^3.2",
-        "symfony/process": "^3.2",
+        "symfony/yaml": "^3.3",
+        "symfony/process": "^3.3",
         "jpry/array-defaults": "^1.0",
-        "monolog/monolog": "^1.22"
+        "monolog/monolog": "^1.22",
+        "symfony/config": "^3.3"
     },
     "config": {
         "vendor-dir": "provision/vendor"

@@ -27,6 +27,9 @@ class Provisioner
     /** @var Logger */
     protected $logger;
 
+    /** @var  array */
+    protected $overrides;
+
     /** @var  DefaultsArray */
     protected $site;
 
@@ -48,6 +51,7 @@ class Provisioner
      * @param string         $site_name   The name of the site.
      * @param array          $site_config The config for the site.
      * @param Logger         $logger      A logger instance.
+     * @param array          $overrides   vvvBase override settings.
      */
     public function __construct(
         ProcessBuilder $builder,
@@ -55,19 +59,16 @@ class Provisioner
         $vm_dir,
         $site_name,
         array $site_config,
-        Logger $logger
+        Logger $logger,
+        array $overrides
     ) {
         $this->builder   = $builder;
         $this->db        = $db;
         $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
-        $this->config    = (array) $site_config;
+        $this->config    = $site_config;
         $this->logger    = $logger;
-
-        // Ensure that there is a custom array in the site config.
-        if (!array_key_exists('custom', $this->config)) {
-            $this->config['custom'] = array();
-        }
+        $this->overrides = $overrides;
 
         $this->setupSite();
     }
@@ -122,7 +123,7 @@ class Provisioner
      */
     protected function setupSite()
     {
-        if (isset($this->config['hosts'])) {
+        if (!empty($this->config['hosts'])) {
             $hosts     = (array) $this->config['hosts'];
             $main_host = $hosts[0];
         } else {
@@ -133,25 +134,8 @@ class Provisioner
         $this->site = new DefaultsArray($this->config['custom']);
         $this->site->setDefaults(
             array(
-                'admin_user'             => 'admin',
-                'admin_password'         => 'password',
-                'admin_email'            => 'admin@localhost.local',
-                'title'                  => 'My Awesome VVV Site',
-                'db_prefix'              => 'wp_',
-                'multisite'              => false,
-                'xipio'                  => true,
-                'version'                => 'latest',
-                'locale'                 => 'en_US',
-                'main_host'              => $main_host,
-                'hosts'                  => $hosts,
-                'plugins'                => array(),
-                'themes'                 => array(),
-                'delete_default_plugins' => false,
-                'delete_default_themes'  => false,
-                'wp_content'             => false,
-                'wp'                     => true,
-                'download_wp'            => true,
-                'htdocs'                 => false,
+                'main_host' => $main_host,
+                'hosts'     => $hosts,
             )
         );
 
@@ -295,6 +279,7 @@ class Provisioner
     protected function createWpConfig()
     {
         if (file_exists("{$this->base_dir}/wp-config.php")) {
+            $this->logger->info('wp-config.php file found');
             return;
         }
 
@@ -335,7 +320,7 @@ PHP;
             foreach ($default_plugins as $plugin) {
                 $cmd = $this->getCmd(array('wp', 'plugin', 'delete', $plugin));
                 $cmd->run();
-                echo $cmd->getOutput();
+                $this->logger->info($cmd->getOutput());
             }
         }
 
@@ -352,7 +337,7 @@ PHP;
             foreach ($default_themes as $theme) {
                 $cmd = $this->getCmd(array('wp', 'theme', 'delete', "twenty{$theme}"));
                 $cmd->run();
-                echo $cmd->getOutput();
+                $this->logger->info($cmd->getOutput());
             }
         }
     }
@@ -443,10 +428,11 @@ PHP;
      *
      * @param string $type  The type of item to install.
      * @param array  $items Array of items to install.
+     * @param array  $skip  Array of items to skip installing.
      *
      * @throws \Exception When an invalid type is provided.
      */
-    protected function installHelper($type, $items)
+    protected function installHelper($type, $items, $skip = array())
     {
         $types = array(
             'plugin' => true,
@@ -456,44 +442,42 @@ PHP;
             throw new \Exception("Invalid installer type: {$type}");
         }
 
+        $flipped = !empty($skip) ? array_flip($skip) : array();
+
         // Change the prefix for the command builder.
         $this->builder->setPrefix(array('wp', $type, 'install'));
 
         $this->logger->info("Installing {$type}s...");
         foreach ($items as $item) {
-            // If the item is just a string, we can install it with no other options.
-            if (is_string($item)) {
-                $cmd = $this->getCmd(array($item));
-            } elseif (is_array($item)) {
-                if (!isset($item[$type])) {
-                    continue;
-                }
 
-                // Grab the item name.
-                $name = $item[$type];
+            // Grab the item name.
+            $name = $item[$type];
 
-                // Determine the item flags.
-                $valid_flags = array(
-                    'version'  => true,
-                    'force'    => true,
-                    'activate' => true,
-                );
-
-                if ('plugin' === $type) {
-                    $valid_flags['activate-network'] = true;
-                }
-
-                $item_flags = array_intersect_key($item, $valid_flags);
-
-                // Generate the command.
-                $cmd = $this->getCmd(array($name), $item_flags);
-            } else {
+            // Maybe skip the item.
+            if (isset($flipped[$name])) {
+                $this->logger->info("Found {$name} in skip list, skipping...");
                 continue;
             }
 
+            // Determine the item flags.
+            $valid_flags = array(
+                'version'  => true,
+                'force'    => true,
+                'activate' => true,
+            );
+
+            if ('plugin' === $type) {
+                $valid_flags['activate-network'] = true;
+            }
+
+            $item_flags = array_intersect_key($item, $valid_flags);
+
+            // Generate the command.
+            $cmd = $this->getCmd(array($name), $item_flags);
+
             // Now run the command.
             $cmd->run();
-            echo $cmd->getOutput();
+            $this->logger->info($cmd->getOutput());
         }
 
         // Restore the normal prefix.
@@ -505,12 +489,13 @@ PHP;
      */
     protected function installPlugins()
     {
-        $plugins = $this->site['plugins'];
+        $plugins = array_merge($this->overrides['plugins'], $this->site['plugins']);
         if (empty($plugins)) {
             return;
         }
 
-        $this->installHelper('plugin', $plugins);
+        $skip = $this->site['skip_plugins'];
+        $this->installHelper('plugin', $plugins, $skip);
     }
 
     /**
@@ -518,7 +503,7 @@ PHP;
      */
     protected function installThemes()
     {
-        $themes = $this->site['themes'];
+        $themes = array_merge($this->overrides['themes'], $this->site['themes']);
         if (empty($themes)) {
             return;
         }
@@ -550,7 +535,9 @@ PHP;
                 $install_flags['subdomains'] = null;
             }
 
-            echo $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput();
+            $this->logger->info(
+                $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput()
+            );
         }
     }
 
@@ -561,7 +548,7 @@ PHP;
     {
         if (file_exists($this->base_dir)) {
             $this->logger->info('Removing default htdocs directory...');
-            echo $this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput();
+            $this->logger->info($this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput());
         }
     }
 
@@ -572,7 +559,7 @@ PHP;
     {
         if (file_exists($this->wp_content)) {
             $this->logger->info('Removing default wp-content directory...');
-            echo $this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput();
+            $this->logger->info($this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput());
         }
     }
 }
