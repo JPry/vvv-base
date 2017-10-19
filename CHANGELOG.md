@@ -13,6 +13,11 @@ Removed
 Fixed
 Security
 
+## v0.4.1 - 2017-10-18
+
+Fixed
+* `admin_password` setting was incorrectly defined in config as just `password`. This has been corrected. (props @Stefan-Adam)
+
 ## v0.4.0 - 2017-10-17
 
 Added
