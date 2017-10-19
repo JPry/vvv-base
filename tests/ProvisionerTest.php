@@ -112,7 +112,7 @@ class ProvisionerTest extends TestCase
 
         $defaults = array(
             'admin_user'             => 'admin',
-            'password'               => 'password',
+            'admin_password'         => 'password',
             'admin_email'            => 'admin@localhost.local',
             'title'                  => 'My Awesome VVV Site',
             'db_prefix'              => 'wp_',
