@@ -51,16 +51,18 @@ try {
         throw new \Exception("Unable to connect to DB. Error: {$db->connect_error}", 1);
     }
 
-    $provisioner = new Provisioner(
+    $container = new ProvisionContainer();
+    $container->addProvisioner(new Provisioner(
         new ProcessBuilder(),
-        $db,
         $options['vm_dir'],
         $options['site_escaped'],
         $site,
         $logger,
         $vvvBase
-    );
-    $provisioner->provision();
+    ));
+    $container->addProvisioner(new DBProvisioner($options['site_escaped'], $db, $logger));
+
+    $container->provision();
 
 } catch (ParseException $e) {
     $logger->error("Unable to parse config file: {$options['vvv_config']}");

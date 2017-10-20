@@ -77,10 +77,7 @@ class ProvisionerTest extends TestCase
         $config    = $this->configProcessor->processConfiguration(new Site(), array($config));
         $overrides = ($this->configProcessor->processConfiguration(new VBExtra(), array($overrides)))['vvvbase'];
 
-        /** @var \mysqli $db */
-        $db = $this->getMockBuilder('\mysqli')->disableOriginalConstructor()->disableOriginalClone()->getMock();
-
-        return new Provisioner($process, $db, $url, $name, $config, $logger, $overrides);
+        return new Provisioner($process, $url, $name, $config, $logger, $overrides);
     }
 
 

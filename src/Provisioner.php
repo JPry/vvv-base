@@ -21,9 +21,6 @@ class Provisioner implements ProvisionerInterface
     /** @var array */
     protected $config;
 
-    /** @var \mysqli */
-    protected $db;
-
     /** @var Logger */
     protected $logger;
 
@@ -46,7 +43,6 @@ class Provisioner implements ProvisionerInterface
      * Provisioner constructor.
      *
      * @param ProcessBuilder $builder     ProcessBuilder for generating commands.
-     * @param \mysqli        $db          Database connection.
      * @param string         $vm_dir      Root directory for the site.
      * @param string         $site_name   The name of the site.
      * @param array          $site_config The config for the site.
@@ -55,7 +51,6 @@ class Provisioner implements ProvisionerInterface
      */
     public function __construct(
         ProcessBuilder $builder,
-        \mysqli $db,
         $vm_dir,
         $site_name,
         array $site_config,
@@ -63,7 +58,6 @@ class Provisioner implements ProvisionerInterface
         array $overrides
     ) {
         $this->builder   = $builder;
-        $this->db        = $db;
         $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
         $this->config    = $site_config;
@@ -78,7 +72,6 @@ class Provisioner implements ProvisionerInterface
      */
     public function provision()
     {
-        $this->createDB();
         $this->createLogs();
         $this->createBaseDir();
         $this->createNginxConfig();
@@ -207,22 +200,6 @@ class Provisioner implements ProvisionerInterface
             $this->cloneHtdocs();
         } elseif (!file_exists($this->base_dir)) {
             mkdir($this->base_dir, 0775, true);
-        }
-    }
-
-    /**
-     * Create the database.
-     */
-    protected function createDB()
-    {
-        $this->logger->info('Checking database for site...');
-        $result = $this->db->query("SHOW DATABASES LIKE '{$this->site_name}'");
-        if (empty($result) || 0 === $result->num_rows) {
-            $this->logger->info("Creating DB for {$this->site_name}");
-            $this->db->query("CREATE DATABASE `{$this->site_name}`;");
-            $this->logger->info("Granting privileges on DB...");
-            $this->db->query("GRANT ALL PRIVILEGES ON `{$this->site_name}`.* TO wp@localhost IDENTIFIED BY 'wp'");
-            $this->logger->info("DB setup complete.");
         }
     }
 
