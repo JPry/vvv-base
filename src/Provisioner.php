@@ -10,7 +10,7 @@ use Monolog\Logger;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
-class Provisioner
+class Provisioner implements ProvisionerInterface
 {
     /** @var  string */
     protected $base_dir;
