@@ -233,9 +233,9 @@ class Provisioner implements ProvisionerInterface
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
         if ($this->site['xipio']) {
-            $nginx_xipio = str_replace('.', '\\.', $this->getXipioBase());
-            $nginx_xipio .= '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
-            $nginx_hosts .= " {$nginx_xipio}";
+            $xipio_host  = '~' . str_replace('.', '\\.', $this->getXipioBase());
+            $xipio_host  .= '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
+            $nginx_hosts .= " {$xipio_host}";
         }
 
         // If the hosts string is found in the file contents, don't try to replace it.
