@@ -66,11 +66,23 @@ class DBProvisioner implements ProvisionerInterface
         $this->logger->info('Checking database for site...');
         $result = $this->db->query("SHOW DATABASES LIKE '{$this->dbName}'");
         if (empty($result) || 0 === $result->num_rows) {
-            $this->logger->info("Creating DB for {$this->dbName}");
-            $this->db->query("CREATE DATABASE `{$this->dbName}`;");
-            $this->logger->info("Granting privileges on DB...");
-            $this->db->query("GRANT ALL PRIVILEGES ON `{$this->dbName}`.* TO wp@localhost IDENTIFIED BY 'wp'");
+            $this->logger->info("Setting up DB for {$this->dbName}");
+            $this->db->multi_query($this->dbCommands());
             $this->logger->info("DB setup complete.");
         }
+    }
+
+    /**
+     * Get the DB Commands to run.
+     *
+     * @author Jeremy Pry
+     * @return string
+     */
+    protected function dbCommands()
+    {
+        return <<< SQL
+CREATE DATABASE `{$this->dbName}`;
+GRANT ALL PRIVILEGES ON `{$this->dbName}`.* TO wp@localhost IDENTIFIED BY 'wp';
+SQL;
     }
 }
