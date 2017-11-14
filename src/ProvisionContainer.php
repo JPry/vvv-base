@@ -14,7 +14,7 @@ class ProvisionContainer implements ProvisionerInterface
      *
      * @var ProvisionerInterface[]
      */
-    protected $provisioners = array();
+    protected $provisioners = [];
 
     /**
      * Provision each of our objects.

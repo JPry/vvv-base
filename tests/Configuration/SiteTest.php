@@ -16,16 +16,16 @@ use Symfony\Component\Config\Definition\Processor;
 class SiteTest extends TestCase
 {
 
-    protected function getProcessed($config = array())
+    protected function getProcessed($config = [])
     {
         $processor = new Processor();
-        return $processor->processConfiguration(new Site(), array($config));
+        return $processor->processConfiguration(new Site(), [$config]);
     }
 
 
     protected function getCustomDefaults()
     {
-        return array(
+        return [
             'admin_user'             => 'admin',
             'admin_password'         => 'password',
             'admin_email'            => 'admin@localhost.local',
@@ -35,21 +35,21 @@ class SiteTest extends TestCase
             'xipio'                  => true,
             'version'                => 'latest',
             'locale'                 => 'en_US',
-            'plugins'                => array(),
-            'themes'                 => array(),
+            'plugins'                => [],
+            'themes'                 => [],
             'delete_default_plugins' => false,
             'delete_default_themes'  => false,
             'wp_content'             => null,
             'wp'                     => true,
             'download_wp'            => true,
             'htdocs'                 => null,
-            'skip_plugins'           => array(),
+            'skip_plugins'           => [],
 
             // Deprecated options are still included for exact comparison.
             'wp-content'             => null,
             'prefix'                 => null,
             'dbprefix'               => null,
-        );
+        ];
     }
 
     /**
@@ -67,61 +67,61 @@ class SiteTest extends TestCase
 
     public function passedValuesProvider()
     {
-        return array(
+        return [
             // Test the defaults
-            array(
-                array(),
-                array(
-                    'hosts'  => array(),
+            [
+                [],
+                [
+                    'hosts'  => [],
                     'custom' => $this->getCustomDefaults(),
-                ),
-            ),
+                ],
+            ],
 
             // Test custom hosts
-            array(
-                array(
-                    'hosts' => array('foo.local', 'bar.local'),
-                ),
-                array(
-                    'hosts'  => array('foo.local', 'bar.local'),
+            [
+                [
+                    'hosts' => ['foo.local', 'bar.local'],
+                ],
+                [
+                    'hosts'  => ['foo.local', 'bar.local'],
                     'custom' => $this->getCustomDefaults(),
-                ),
-            ),
+                ],
+            ],
 
             // Test custom settings
-            array(
-                array(
-                    'custom' => array(
+            [
+                [
+                    'custom' => [
                         'admin_user' => 'jpry',
-                    ),
-                ),
-                array(
-                    'hosts'  => array(),
+                    ],
+                ],
+                [
+                    'hosts'  => [],
                     'custom' => array_merge(
                         $this->getCustomDefaults(),
-                        array(
+                        [
                             'admin_user' => 'jpry',
-                        )
+                        ]
                     ),
-                ),
-            ),
+                ],
+            ],
 
-            array(
-                array(
-                    'custom' => array(
-                        'skip_plugins' => array('jetpack'),
-                    ),
-                ),
-                array(
-                    'hosts'  => array(),
+            [
+                [
+                    'custom' => [
+                        'skip_plugins' => ['jetpack'],
+                    ],
+                ],
+                [
+                    'hosts'  => [],
                     'custom' => array_merge(
                         $this->getCustomDefaults(),
-                        array(
-                            'skip_plugins' => array('jetpack'),
-                        )
+                        [
+                            'skip_plugins' => ['jetpack'],
+                        ]
                     ),
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 }

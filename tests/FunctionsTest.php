@@ -17,13 +17,13 @@ class FunctionsTest extends TestCase
 
     public function testFlags()
     {
-        $expected = array(
+        $expected = [
             'site:',
             'site_escaped:',
             'vm_dir:',
             'vvv_path_to_site:',
             'vvv_config:',
-        );
+        ];
         $this->assertEquals($expected, get_flags());
     }
 
@@ -34,7 +34,7 @@ class FunctionsTest extends TestCase
      */
     public function testValidateFlagsEmpty()
     {
-        validate_flags(array());
+        validate_flags([]);
     }
 
 
@@ -52,17 +52,17 @@ class FunctionsTest extends TestCase
      */
     public function testValidateSiteMissing()
     {
-        validate_site(array(), __FUNCTION__);
+        validate_site([], __FUNCTION__);
     }
 
 
     public function testValidateSite()
     {
-        $config = array(
-            'sites' => array(
-                __FUNCTION__ => array(),
-            ),
-        );
+        $config = [
+            'sites' => [
+                __FUNCTION__ => [],
+            ],
+        ];
         validate_site($config, __FUNCTION__);
         $this->incrementAssertionCount();
     }

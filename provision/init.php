@@ -24,7 +24,7 @@ $options = get_cli_options();
 // Set up logger.
 $stream = new StreamHandler('php://stdout', Logger::INFO);
 $stream->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n"));
-$logger = new Logger('provisioner', array($stream));
+$logger = new Logger('provisioner', [$stream]);
 
 try {
     // Ensure we have all of the necessary options.
@@ -39,10 +39,10 @@ try {
     // Ensure the site config is valid.
     $siteConfig = $config['sites'][$options['site_escaped']];
     $processor  = new Processor();
-    $site       = $processor->processConfiguration(new Site(), array($siteConfig));
+    $site       = $processor->processConfiguration(new Site(), [$siteConfig]);
 
     // Process vvvbase config
-    $vvvBase = ($processor->processConfiguration(new VBExtra(), array($config)))['vvvbase'];
+    $vvvBase = ($processor->processConfiguration(new VBExtra(), [$config]))['vvvbase'];
 
     // Set up and run our provisioner.
     $logger->info('Connecting to the DB...');

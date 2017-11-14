@@ -58,9 +58,9 @@ class ProvisionerTest extends TestCase
      */
     protected function getProvisioner(
         $process = null,
-        $config = array(),
+        $config = [],
         $logger = null,
-        $overrides = array()
+        $overrides = []
     ) {
         // Handle items that weren't passed.
         if (null === $process) {
@@ -68,7 +68,7 @@ class ProvisionerTest extends TestCase
             $process  = $prophesy->reveal();
         }
         if (null === $logger) {
-            $logger = new Logger('provisionTest', array(new NullHandler()));
+            $logger = new Logger('provisionTest', [new NullHandler()]);
         }
 
         // Set up defaults
@@ -107,7 +107,7 @@ class ProvisionerTest extends TestCase
         $site        = $this->getPublicProperty('site', $provisioner);
         $value       = $site->getValue($provisioner);
 
-        $defaults = array(
+        $defaults = [
             'admin_user'             => 'admin',
             'admin_password'         => 'password',
             'admin_email'            => 'admin@localhost.local',
@@ -117,16 +117,16 @@ class ProvisionerTest extends TestCase
             'xipio'                  => true,
             'version'                => 'latest',
             'locale'                 => 'en_US',
-            'plugins'                => array(),
-            'themes'                 => array(),
+            'plugins'                => [],
+            'themes'                 => [],
             'delete_default_plugins' => false,
             'delete_default_themes'  => false,
             'wp_content'             => null,
             'wp'                     => true,
             'download_wp'            => true,
             'htdocs'                 => null,
-            'skip_plugins'           => array(),
-        );
+            'skip_plugins'           => [],
+        ];
 
         // Test the defaults from the site config
         foreach ($defaults as $key => $default) {
@@ -136,7 +136,7 @@ class ProvisionerTest extends TestCase
 
         // Test the added defaults
         $this->assertEquals('provision-test.local', $value['main_host']);
-        $this->assertEquals(array('provision-test.local'), $value['hosts']);
+        $this->assertEquals(['provision-test.local'], $value['hosts']);
 
         // Test other set properties
         $baseDir = $this->getPublicProperty('base_dir', $provisioner);
@@ -182,27 +182,27 @@ class ProvisionerTest extends TestCase
     {
         $provisioner = $this->getProvisioner();
         $helper      = $this->getPublicMethod('installHelper', $provisioner);
-        $helper->invoke($provisioner, 'provisiontest', array());
+        $helper->invoke($provisioner, 'provisiontest', []);
     }
 
 
     public function testSkippedPlugins()
     {
-        $config    = array(
-            'custom' => array(
-                'skip_plugins' => array('jetpack'),
-            ),
-        );
-        $overrides = array(
-            'vvvbase' => array(
-                'plugins' => array(
-                    array(
+        $config    = [
+            'custom' => [
+                'skip_plugins' => ['jetpack'],
+            ],
+        ];
+        $overrides = [
+            'vvvbase' => [
+                'plugins' => [
+                    [
                         'plugin'   => 'jetpack',
                         'activate' => true,
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
         $loggerProphesy = $this->prophesize(Logger::class);
         $logger         = $loggerProphesy->reveal();
@@ -227,12 +227,12 @@ class ProvisionerTest extends TestCase
         /** @var Process $result */
         $result = $getCmd->invoke(
             $provisioner,
-            array('foo'),
-            array(
+            ['foo'],
+            [
                 'bar' => false,
                 'baz' => 'some value',
                 'boo' => null,
-            )
+            ]
         );
         $this->assertEquals("'foo' '--baz=some value' '--boo'", $result->getCommandLine());
     }
