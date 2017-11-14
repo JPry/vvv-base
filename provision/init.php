@@ -25,7 +25,7 @@ $options = get_cli_options();
 // Set up logger.
 $stream = new StreamHandler('php://stdout', Logger::INFO);
 $stream->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n"));
-$logger = new Logger('provisioner', [$stream]);
+$logger = new Logger('init', [$stream]);
 
 try {
     // Set up filesystem object.
@@ -67,7 +67,7 @@ try {
         $options['vm_dir'],
         $options['site_escaped'],
         $site,
-        $logger,
+        new Logger('Provisioner', [$stream]),
         $vvvBase
     ));
 
