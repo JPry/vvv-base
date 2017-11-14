@@ -3,6 +3,7 @@
 namespace JPry\VVVBase;
 
 use Monolog\Logger;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Database Provisioner.
@@ -26,6 +27,13 @@ class DBProvisioner implements ProvisionerInterface
     protected $db;
 
     /**
+     * Filesystem object.
+     *
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    /**
      * Logger instance.
      *
      * @var Logger
@@ -35,15 +43,17 @@ class DBProvisioner implements ProvisionerInterface
     /**
      * DBProvisioner constructor.
      *
-     * @param string  $dbName The database name.
-     * @param \mysqli $mysqli The MySQL connection.
-     * @param Logger  $logger The Logger instance.
+     * @param string     $dbName     The database name to provision.
+     * @param \mysqli    $mysqli     The MySQL connection.
+     * @param Logger     $logger     The Logger instance.
+     * @param Filesystem $filesystem Filesystem object.
      */
-    public function __construct($dbName, \mysqli $mysqli, Logger $logger)
+    public function __construct($dbName, \mysqli $mysqli, Logger $logger, Filesystem $filesystem)
     {
-        $this->db     = $mysqli;
-        $this->dbName = $dbName;
-        $this->logger = $logger;
+        $this->db         = $mysqli;
+        $this->dbName     = $this->db->real_escape_string($dbName);
+        $this->filesystem = $filesystem;
+        $this->logger     = $logger;
     }
 
     /**
@@ -54,6 +64,7 @@ class DBProvisioner implements ProvisionerInterface
     public function provision()
     {
         $this->createDB();
+        $this->initCustom();
     }
 
     /**
@@ -69,6 +80,34 @@ class DBProvisioner implements ProvisionerInterface
             $this->logger->info("Setting up DB for {$this->dbName}");
             $this->db->multi_query($this->dbCommands());
             $this->logger->info("DB setup complete.");
+        }
+    }
+
+    /**
+     * Update (and maybe create) the init-custom.sql file.
+     *
+     * @author Jeremy Pry
+     */
+    protected function initCustom()
+    {
+        $customFile = '/srv/database/init-custom.sql';
+
+        // Make sure it exists
+        if (!$this->filesystem->exists($customFile)) {
+            $this->logger->info("Creating the {$customFile} file.");
+            $this->filesystem->touch($customFile);
+        }
+
+        // Read contents
+        $contents = file_get_contents($customFile);
+
+        // Determine if the DB is already present in contents
+        $exists = strpos($contents, $this->dbName);
+
+        // Add line if needed, and update file
+        if (false === $exists) {
+            $this->logger->info("Appending DB commands to {$customFile} file.");
+            $this->filesystem->appendToFile($customFile, "\n\n" . $this->dbCommands());
         }
     }
 

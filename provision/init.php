@@ -8,6 +8,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -27,6 +28,9 @@ $stream->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n")
 $logger = new Logger('provisioner', [$stream]);
 
 try {
+    // Set up filesystem object.
+    $filesystem = new Filesystem();
+
     // Ensure we have all of the necessary options.
     validate_flags($options);
 
@@ -52,6 +56,12 @@ try {
     }
 
     $container = new ProvisionContainer();
+    $container->addProvisioner(new DBProvisioner(
+        $options['site_escaped'],
+        $db,
+        new Logger('DBProvisioner', [$stream]),
+        $filesystem
+    ));
     $container->addProvisioner(new Provisioner(
         new ProcessBuilder(),
         $options['vm_dir'],
@@ -60,7 +70,6 @@ try {
         $logger,
         $vvvBase
     ));
-    $container->addProvisioner(new DBProvisioner($options['site_escaped'], $db, $logger));
 
     $container->provision();
 
