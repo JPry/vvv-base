@@ -122,6 +122,41 @@ class SiteTest extends TestCase
                     ),
                 ],
             ],
+
+            // Test for valid multisite values
+            [
+                [
+                    'custom' => [
+                        'multisite' => 'subdomain',
+                    ],
+                ],
+                [
+                    'hosts'  => [],
+                    'custom' => array_merge(
+                        $this->getCustomDefaults(),
+                        [
+                            'multisite' => 'subdomain',
+                        ]
+                    ),
+                ],
+            ],
+
+            [
+                [
+                    'custom' => [
+                        'multisite' => 'subdomains',
+                    ],
+                ],
+                [
+                    'hosts'  => [],
+                    'custom' => array_merge(
+                        $this->getCustomDefaults(),
+                        [
+                            'multisite' => 'subdomain',
+                        ]
+                    ),
+                ],
+            ],
         ];
     }
 }
