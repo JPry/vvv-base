@@ -8,6 +8,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -24,9 +25,12 @@ $options = get_cli_options();
 // Set up logger.
 $stream = new StreamHandler('php://stdout', Logger::INFO);
 $stream->setFormatter(new LineFormatter("%channel%: [%level_name%] %message%\n"));
-$logger = new Logger('provisioner', array($stream));
+$logger = new Logger('init', [$stream]);
 
 try {
+    // Set up filesystem object.
+    $filesystem = new Filesystem();
+
     // Ensure we have all of the necessary options.
     validate_flags($options);
 
@@ -39,10 +43,10 @@ try {
     // Ensure the site config is valid.
     $siteConfig = $config['sites'][$options['site_escaped']];
     $processor  = new Processor();
-    $site       = $processor->processConfiguration(new Site(), array($siteConfig));
+    $site       = $processor->processConfiguration(new Site(), [$siteConfig]);
 
     // Process vvvbase config
-    $vvvBase = ($processor->processConfiguration(new VBExtra(), array($config)))['vvvbase'];
+    $vvvBase = ($processor->processConfiguration(new VBExtra(), [$config]))['vvvbase'];
 
     // Set up and run our provisioner.
     $logger->info('Connecting to the DB...');
@@ -51,16 +55,23 @@ try {
         throw new \Exception("Unable to connect to DB. Error: {$db->connect_error}", 1);
     }
 
-    $provisioner = new Provisioner(
-        new ProcessBuilder(),
+    $container = new ProvisionContainer();
+    $container->addProvisioner(new DBProvisioner(
+        $options['site_escaped'],
         $db,
+        new Logger('DBProvisioner', [$stream]),
+        $filesystem
+    ));
+    $container->addProvisioner(new Provisioner(
+        new ProcessBuilder(),
         $options['vm_dir'],
         $options['site_escaped'],
         $site,
-        $logger,
+        new Logger('Provisioner', [$stream]),
         $vvvBase
-    );
-    $provisioner->provision();
+    ));
+
+    $container->provision();
 
 } catch (ParseException $e) {
     $logger->error("Unable to parse config file: {$options['vvv_config']}");

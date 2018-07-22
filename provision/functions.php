@@ -22,13 +22,13 @@ function get_cli_options()
  */
 function get_options()
 {
-    return array(
+    return [
         'site',
         'site_escaped',
         'vm_dir',
         'vvv_path_to_site',
         'vvv_config',
-    );
+    ];
 }
 
 /**

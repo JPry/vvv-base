@@ -10,7 +10,7 @@ use Monolog\Logger;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
-class Provisioner
+class Provisioner implements ProvisionerInterface
 {
     /** @var  string */
     protected $base_dir;
@@ -20,9 +20,6 @@ class Provisioner
 
     /** @var array */
     protected $config;
-
-    /** @var \mysqli */
-    protected $db;
 
     /** @var Logger */
     protected $logger;
@@ -46,7 +43,6 @@ class Provisioner
      * Provisioner constructor.
      *
      * @param ProcessBuilder $builder     ProcessBuilder for generating commands.
-     * @param \mysqli        $db          Database connection.
      * @param string         $vm_dir      Root directory for the site.
      * @param string         $site_name   The name of the site.
      * @param array          $site_config The config for the site.
@@ -55,7 +51,6 @@ class Provisioner
      */
     public function __construct(
         ProcessBuilder $builder,
-        \mysqli $db,
         $vm_dir,
         $site_name,
         array $site_config,
@@ -63,7 +58,6 @@ class Provisioner
         array $overrides
     ) {
         $this->builder   = $builder;
-        $this->db        = $db;
         $this->vm_dir    = $vm_dir;
         $this->site_name = $site_name;
         $this->config    = $site_config;
@@ -78,7 +72,6 @@ class Provisioner
      */
     public function provision()
     {
-        $this->createDB();
         $this->createLogs();
         $this->createBaseDir();
         $this->createNginxConfig();
@@ -132,12 +125,10 @@ class Provisioner
         }
 
         $this->site = new DefaultsArray($this->config['custom']);
-        $this->site->setDefaults(
-            array(
-                'main_host' => $main_host,
-                'hosts'     => $hosts,
-            )
-        );
+        $this->site->setDefaults([
+            'main_host' => $main_host,
+            'hosts'     => $hosts,
+        ]);
 
         // Handle old or alternate option names
         if (isset($this->site['wp-content'])) {
@@ -169,10 +160,10 @@ class Provisioner
 
         $this->logger->info("Cloning [{$this->site['htdocs']}] into {$this->base_dir}...");
         echo $this->getCmd(
-            array('git', 'clone', $this->site['htdocs'], $this->base_dir),
-            array(
+            ['git', 'clone', $this->site['htdocs'], $this->base_dir],
+            [
                 'recursive' => null,
-            )
+            ]
         )->mustRun()->getOutput();
     }
 
@@ -191,10 +182,10 @@ class Provisioner
 
         $this->logger->info("Cloning [{$this->site['wp_content']}] into wp-content...");
         echo $this->getCmd(
-            array('git', 'clone', $this->site['wp_content'], $this->wp_content),
-            array(
+            ['git', 'clone', $this->site['wp_content'], $this->wp_content],
+            [
                 'recursive' => null,
-            )
+            ]
         )->mustRun()->getOutput();
     }
 
@@ -211,22 +202,6 @@ class Provisioner
     }
 
     /**
-     * Create the database.
-     */
-    protected function createDB()
-    {
-        $this->logger->info('Checking database for site...');
-        $result = $this->db->query("SHOW DATABASES LIKE '{$this->site_name}'");
-        if (empty($result) || 0 === $result->num_rows) {
-            $this->logger->info("Creating DB for {$this->site_name}");
-            $this->db->query("CREATE DATABASE `{$this->site_name}`;");
-            $this->logger->info("Granting privileges on DB...");
-            $this->db->query("GRANT ALL PRIVILEGES ON `{$this->site_name}`.* TO wp@localhost IDENTIFIED BY 'wp'");
-            $this->logger->info("DB setup complete.");
-        }
-    }
-
-    /**
      * Create the log files and directory.
      */
     protected function createLogs()
@@ -236,7 +211,7 @@ class Provisioner
             mkdir("{$this->vm_dir}/log", 0775);
         }
 
-        foreach (array('error.log', 'access.log') as $logfile) {
+        foreach (['error.log', 'access.log'] as $logfile) {
             $file = "{$this->vm_dir}/log/{$logfile}";
             if (!file_exists($file)) {
                 file_put_contents($file, '');
@@ -258,9 +233,9 @@ class Provisioner
         // Build the hosts directive, maybe including xipio.
         $nginx_hosts = join(' ', $this->site['hosts']);
         if ($this->site['xipio']) {
-            $nginx_xipio = str_replace('.', '\\.', $this->getXipioBase());
-            $nginx_xipio .= '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
-            $nginx_hosts .= " {$nginx_xipio}";
+            $xipio_host  = '~' . str_replace('.', '\\.', $this->getXipioBase());
+            $xipio_host  .= '\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\.xip\\\\.io$';
+            $nginx_hosts .= " {$xipio_host}";
         }
 
         // If the hosts string is found in the file contents, don't try to replace it.
@@ -293,8 +268,8 @@ define( 'JETPACK_STAGING_MODE', true );
 PHP;
 
         echo $this->getCmd(
-            array('wp', 'config', 'create'),
-            array(
+            ['wp', 'config', 'create'],
+            [
                 'dbname'    => $this->site_name,
                 'dbuser'    => 'wp',
                 'dbpass'    => 'wp',
@@ -302,7 +277,7 @@ PHP;
                 'dbprefix'  => $this->site['db_prefix'],
                 'locale'    => $this->site['locale'],
                 'extra-php' => $extra_php,
-            )
+            ]
         )->mustRun()->getOutput();
     }
 
@@ -313,12 +288,12 @@ PHP;
     {
         if ($this->site['delete_default_plugins']) {
             $this->logger->info('Removing default plugins...');
-            $default_plugins = array(
+            $default_plugins = [
                 'akismet',
                 'hello',
-            );
+            ];
             foreach ($default_plugins as $plugin) {
-                $cmd = $this->getCmd(array('wp', 'plugin', 'delete', $plugin));
+                $cmd = $this->getCmd(['wp', 'plugin', 'delete', $plugin]);
                 $cmd->run();
                 $this->logger->info($cmd->getOutput());
             }
@@ -326,16 +301,16 @@ PHP;
 
         if ($this->site['delete_default_themes']) {
             $this->logger->info('Removing default themes...');
-            $default_themes = array(
+            $default_themes = [
                 'twelve',
                 'thirteen',
                 'fourteen',
                 'fifteen',
                 'sixteen',
                 'seventeen',
-            );
+            ];
             foreach ($default_themes as $theme) {
-                $cmd = $this->getCmd(array('wp', 'theme', 'delete', "twenty{$theme}"));
+                $cmd = $this->getCmd(['wp', 'theme', 'delete', "twenty{$theme}"]);
                 $cmd->run();
                 $this->logger->info($cmd->getOutput());
             }
@@ -354,11 +329,11 @@ PHP;
         }
 
         echo $this->getCmd(
-            array('wp', 'core', 'download'),
-            array(
+            ['wp', 'core', 'download'],
+            [
                 'locale'  => $this->site['locale'],
                 'version' => $this->site['version'],
-            )
+            ]
         )->mustRun()->getOutput();
     }
 
@@ -370,7 +345,7 @@ PHP;
      *
      * @return Process
      */
-    protected function getCmd(array $positional, $flags = array())
+    protected function getCmd(array $positional, $flags = [])
     {
         $this->builder->setArguments($positional);
         foreach ($flags as $flag => $value) {
@@ -434,10 +409,10 @@ PHP;
      */
     protected function installHelper($type, $items, $skip = array())
     {
-        $types = array(
+        $types = [
             'plugin' => true,
             'theme'  => true,
-        );
+        ];
         if (!isset($types[$type])) {
             throw new \Exception("Invalid installer type: {$type}");
         }
@@ -445,7 +420,7 @@ PHP;
         $flipped = !empty($skip) ? array_flip($skip) : array();
 
         // Change the prefix for the command builder.
-        $this->builder->setPrefix(array('wp', $type, 'install'));
+        $this->builder->setPrefix(['wp', $type, 'install']);
 
         $this->logger->info("Installing {$type}s...");
         foreach ($items as $item) {
@@ -460,11 +435,11 @@ PHP;
             }
 
             // Determine the item flags.
-            $valid_flags = array(
+            $valid_flags = [
                 'version'  => true,
                 'force'    => true,
                 'activate' => true,
-            );
+            ];
 
             if ('plugin' === $type) {
                 $valid_flags['activate-network'] = true;
@@ -473,7 +448,7 @@ PHP;
             $item_flags = array_intersect_key($item, $valid_flags);
 
             // Generate the command.
-            $cmd = $this->getCmd(array($name), $item_flags);
+            $cmd = $this->getCmd([$name], $item_flags);
 
             // Now run the command.
             $cmd->run();
@@ -481,7 +456,7 @@ PHP;
         }
 
         // Restore the normal prefix.
-        $this->builder->setPrefix(array());
+        $this->builder->setPrefix([]);
     }
 
     /**
@@ -516,11 +491,11 @@ PHP;
      */
     protected function installWordPress()
     {
-        $is_installed = $this->getCmd(array('wp', 'core', 'is-installed'))->run();
+        $is_installed = $this->getCmd(['wp', 'core', 'is-installed'])->run();
         if (0 !== $is_installed) {
             $this->logger->info('Installing WordPress...');
             $install_command = $this->site['multisite'] ? 'multisite-install' : 'install';
-            $install_flags   = array(
+            $install_flags   = [
                 'url'            => $this->site['main_host'],
                 'title'          => $this->site['title'],
                 'admin_user'     => $this->site['admin_user'],
@@ -528,7 +503,7 @@ PHP;
                 'admin_email'    => $this->site['admin_email'],
                 'skip-plugins'   => null,
                 'skip-themes'    => null,
-            );
+            ];
 
             // Include the flag for subdomains if needed.
             if ($this->site['multisite'] && 0 === stripos($this->site['multisite'], 'subdomain')) {
@@ -536,7 +511,7 @@ PHP;
             }
 
             $this->logger->info(
-                $this->getCmd(array('wp', 'core', $install_command), $install_flags)->mustRun()->getOutput()
+                $this->getCmd(['wp', 'core', $install_command], $install_flags)->mustRun()->getOutput()
             );
         }
     }
@@ -548,7 +523,7 @@ PHP;
     {
         if (file_exists($this->base_dir)) {
             $this->logger->info('Removing default htdocs directory...');
-            $this->logger->info($this->getCmd(array('rm', '-rf', $this->base_dir))->mustRun()->getOutput());
+            $this->logger->info($this->getCmd(['rm', '-rf', $this->base_dir])->mustRun()->getOutput());
         }
     }
 
@@ -559,7 +534,7 @@ PHP;
     {
         if (file_exists($this->wp_content)) {
             $this->logger->info('Removing default wp-content directory...');
-            $this->logger->info($this->getCmd(array('rm', '-rf', $this->wp_content))->mustRun()->getOutput());
+            $this->logger->info($this->getCmd(['rm', '-rf', $this->wp_content])->mustRun()->getOutput());
         }
     }
 }
