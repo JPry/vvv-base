@@ -4,6 +4,12 @@
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/JPry/vvv-base.svg)](http://isitmaintained.com/project/JPry/vvv-base "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/JPry/vvv-base.svg)](http://isitmaintained.com/project/JPry/vvv-base "Percentage of issues still open")
 
+---
+# THIS REPO HAS BEEN ARCHIVED
+
+It has been many years since I have used or worked on VVV, so I am archiving this repo.
+---
+
 Base repository for new VVV2 sites
 
 Please [report any issues](https://github.com/JPry/vvv-base/issues) you may find.
